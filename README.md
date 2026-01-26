@@ -115,6 +115,7 @@ Esto:
 
 - Guarda:
 -- transcripts/reunion1.txt
+  
 -- outputs/reunion1_tecnico.md
 
 ## 3. Procesar un archivo de texto
