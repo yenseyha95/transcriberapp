@@ -12,3 +12,5 @@ audios/*
 # Archivos temporales del sistema
 __pycache__/
 *.pyc
+
+transcriber_app/modules/emails.py
