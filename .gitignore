@@ -1,0 +1,14 @@
+# Entorno virtual
+venv/
+.env
+
+# Archivos generados por la app
+outputs/*
+transcripts/*
+
+# Archivos de audio de entrada (si no quieres subirlos)
+audios/*
+
+# Archivos temporales del sistema
+__pycache__/
+*.pyc

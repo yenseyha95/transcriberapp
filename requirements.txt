@@ -1,0 +1,20 @@
+ffmpeg-python==0.2.0
+google-api-core==2.28.1
+google-auth==2.47.0
+google-genai==1.60.0
+google-generativeai==0.8.5
+grpcio==1.76.0
+httpx==0.28.1
+numpy==1.26.4
+openai-whisper==20250625
+protobuf==5.29.5
+pydub==0.25.1
+python-dotenv==1.1.1
+requests==2.32.3
+torch @ file:///home/jetson/Public/wheels-toch/torch-2.3.0-cp310-cp310-linux_aarch64.whl#sha256=5feee5f5d1a75229eb5290c6fcdc534658dd8b99e55e4a49e8f7c509c313d52d
+torchaudio @ file:///home/jetson/Public/wheels-toch/torchaudio-2.3.0%2B952ea74-cp310-cp310-linux_aarch64.whl#sha256=0aaa066463c02b4a0939dc881c48bd1d92c5b42b76d339282e2656e10aa15041
+tqdm==4.67.1
+typing_extensions==4.15.0
+uritemplate==4.2.0
+wget==3.2
+wrapt==2.0.0
