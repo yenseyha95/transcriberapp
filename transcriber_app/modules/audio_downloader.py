@@ -42,7 +42,7 @@ def get_audio_duration(path: str) -> float:
     return float(info["format"]["duration"])
 
 
-def download_audio(url: str, output_dir: str = "./audios", max_duration: int = 900) -> str:
+def download_audio(url: str, output_dir: str = "./audios", max_duration: int = 9000) -> str:
     """
     Descarga solo el audio de un vídeo y lo convierte a MP3.
     Devuelve la ruta final del archivo.
