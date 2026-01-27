@@ -1,7 +1,7 @@
 # ============================================================
 #   BASE: JetPack 6.x + CUDA 12.6 + PyTorch 2.4.0 (NVIDIA)
 # ============================================================
-FROM nvcr.io/nvidia/l4t-base:r36.2.0
+FROM dustynv/l4t-ml:r36.4.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # yt-dlp actualizado
-RUN pip install --no-cache-dir yt-dlp
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel yt-dlp
 
 # ============================================================
 #   DIRECTORIO DE TRABAJO
@@ -34,8 +34,13 @@ COPY . /app
 # ============================================================
 #   INSTALAR DEPENDENCIAS DEL PROYECTO
 # ============================================================
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ninja-build cmake build-essential \
+ && rm -rf /var/lib/apt/lists/*
+
 # Torch ya viene instalado en la imagen base (2.4.0 NVIDIA)
 # Solo instalamos requirements.txt
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ============================================================

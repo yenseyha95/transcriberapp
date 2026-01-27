@@ -132,9 +132,9 @@ nodeenv==1.9.1
 numba==0.62.1
 numpy==1.26.4
 oauthlib==3.3.1
-onnxruntime-gpu @ file:///home/jetson/Public/wheels-toch/onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl#sha256=136b263209b36c9a57d3b1605c3fa709a924238bdbf6a64d73b7d17a6cbd6b5f
+# wheels/onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl
 openai==1.67.0
-openai-whisper==20250625
+faster-whisper==1.0.0
 opencv-python==4.9.0.80
 orderedmultidict==1.0.1
 packaging==25.0
@@ -228,9 +228,7 @@ tld==0.13.1
 tldextract==5.3.0
 tokenizers==0.19.1
 tomli==2.2.1
-torch @ file:///home/jetson/Public/wheels-toch/torch-2.3.0-cp310-cp310-linux_aarch64.whl#sha256=5feee5f5d1a75229eb5290c6fcdc534658dd8b99e55e4a49e8f7c509c313d52d
-torchaudio @ file:///home/jetson/Public/wheels-toch/torchaudio-2.3.0%2B952ea74-cp310-cp310-linux_aarch64.whl#sha256=0aaa066463c02b4a0939dc881c48bd1d92c5b42b76d339282e2656e10aa15041
-torchvision @ file:///home/jetson/Public/wheels-toch/torchvision-0.18.0a0%2B6043bc2-cp310-cp310-linux_aarch64.whl#sha256=31fe822d2c0a298056ae1e1a73a87e771be05cdb8f47659de1a1e0f65bd1445a
+# wheels/torch-2.4.0a0+3bcc3cddb5.nv24.07.16234504-cp310-cp310-linux_aarch64.whl
 tqdm==4.67.1
 trafilatura==2.0.0
 transformers==4.44.2
