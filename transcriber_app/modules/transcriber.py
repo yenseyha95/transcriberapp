@@ -1,7 +1,7 @@
 import os
 import tempfile
 import subprocess
-from faster_whisper import WhisperModel
+import whisper
 
 # Detectar Jetson
 IS_JETSON = os.path.exists('/etc/nv_tegra_release')
@@ -10,6 +10,9 @@ if IS_JETSON:
 
 
 def ensure_wav(input_path: str) -> str:
+    """
+    Convierte cualquier formato de audio a WAV mono 16 kHz.
+    """
     tmp_wav = tempfile.mktemp(suffix=".wav")
 
     cmd = [
@@ -29,24 +32,25 @@ def ensure_wav(input_path: str) -> str:
 class Transcriber:
     def __init__(self, model_size="base"):
         """
-        Carga el modelo faster-whisper optimizado para Jetson.
+        Carga el modelo openai-whisper.
+        En Jetson usa GPU si torch lo permite.
         """
-        compute_type = "float16" if IS_JETSON else "int8"
+        device = "cuda" if IS_JETSON else "cpu"
 
-        self.model = WhisperModel(
-            model_size,
-            device="cuda" if IS_JETSON else "cpu",
-            compute_type=compute_type
-        )
+        # Carga del modelo
+        self.model = whisper.load_model(model_size, device=device)
 
     def transcribe(self, audio_path: str) -> str:
+        """
+        Transcribe un archivo de audio usando openai-whisper.
+        """
         wav_path = ensure_wav(audio_path)
 
-        segments, info = self.model.transcribe(
+        result = self.model.transcribe(
             wav_path,
-            beam_size=5,
-            language=None  # auto-detección
+            language=None,   # autodetección
+            fp16=IS_JETSON   # Jetson soporta FP16
         )
 
-        text = " ".join([seg.text for seg in segments]).strip()
+        text = result.get("text", "").strip()
         return text

@@ -2,7 +2,7 @@ import subprocess
 from pathlib import Path
 
 from .emails import RECIPIENTS
-from modules.logging.logging_config import setup_logging
+from transcriber_app.modules.logging.logging_config import setup_logging
 
 # Logging
 logger = setup_logging("transcribeapp")

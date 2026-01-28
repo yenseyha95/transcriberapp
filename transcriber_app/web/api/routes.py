@@ -5,13 +5,12 @@ import uuid
 
 from .background import process_audio_job
 from .background import JOB_STATUS
-from modules.logging.logging_config import setup_logging
+from transcriber_app.modules.logging.logging_config import setup_logging
 
 # Logging
 logger = setup_logging("transcribeapp")
 
 router = APIRouter()
-
 
 @router.post("/upload-audio")
 async def upload_audio(

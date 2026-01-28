@@ -1,33 +1,24 @@
 # ============================================================
-#   BASE: JetPack 6.x + CUDA 12.6 + PyTorch 2.4.0 (NVIDIA)
+#   BASE: JetPack 6.x
 # ============================================================
 FROM dustynv/l4t-ml:r36.4.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 # ============================================================
-#   SISTEMA: ffmpeg, git, wget, yt-dlp, dependencias nativas
+#   SISTEMA: Solo lo esencial
 # ============================================================
 RUN apt-get update && apt-get install -y \
     ffmpeg \
-    git \
     wget \
     curl \
     python3-pip \
     python3-dev \
     libsndfile1 \
-    # Dependencias necesarias para PyAV
-    libavformat-dev \
-    libavcodec-dev \
-    libavdevice-dev \
-    libavutil-dev \
-    libswscale-dev \
-    libswresample-dev \
-    libavfilter-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # ============================================================
-#   INSTALAR yt-dlp (binario oficial compatible con Jetson)
+#   INSTALAR yt-dlp
 # ============================================================
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
         -o /usr/local/bin/yt-dlp \
@@ -39,43 +30,64 @@ RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
 WORKDIR /app
 
 # ============================================================
-#   COPIAR SOLO requirements.txt (para cache)
+#   COPIAR WHEELS (incluyendo TU wheel CUDA)
 # ============================================================
 COPY wheels/ /app/wheels/
-COPY requirements.txt /app/requirements.txt
+
+# ============================================================
+#   INSTALAR PYTHON DEPENDENCIAS BASE
+# ============================================================
+# Primero algunas dependencias base que PyTorch necesita
+RUN pip install --no-cache-dir \
+    numpy==1.26.4 \
+    typing_extensions==4.12.2
+
+# ============================================================
+#   INSTALAR TU WHEEL CUDA (el más crítico)
+# ============================================================
+RUN echo "Instalando tu wheel CUDA personalizado..." && \
+    pip install --no-cache-dir /app/wheels/torch_cuda_jetpack-2.3.0-py3-none-any.whl
+
+# ============================================================
+#   VERIFICAR que CUDA funciona
+# ============================================================
+RUN python3 -c "\
+import torch; \
+print(f'[DOCKER BUILD] Torch version: {torch.__version__}'); \
+print(f'[DOCKER BUILD] CUDA version: {torch.version.cuda}'); \
+print(f'[DOCKER BUILD] CUDA available: {torch.cuda.is_available()}'); \
+"
+
+# ============================================================
+#   INSTALAR TORCHAUDIO y TORCHVISION
+# ============================================================
+RUN pip install --no-cache-dir /app/wheels/torchaudio-2.3.0+952ea74-cp310-cp310-linux_aarch64.whl
+RUN pip install --no-cache-dir /app/wheels/torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl
+
+# ============================================================
+#   INSTALAR WHISPER
+# ============================================================
+RUN pip install --no-cache-dir /app/wheels/openai_whisper-20250625-py3-none-any.whl
+
+# ============================================================
+#   INSTALAR ONNX RUNTIME GPU
+# ============================================================
+RUN pip install --no-cache-dir /app/wheels/onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl
+
+# ============================================================
+#   VERIFICAR WHISPER
+# ============================================================
+RUN python3 -c "\
+import whisper; \
+print(f'[DOCKER BUILD] Whisper version: {whisper.__version__}'); \
+"
 
 # ============================================================
 #   INSTALAR DEPENDENCIAS DEL PROYECTO
 # ============================================================
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps -r requirements.txt
-
-# Sobrescribir typing_extensions del sistema (necesario para Pydantic)
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple \
-    --upgrade --force-reinstall typing_extensions==4.12.2
-
-# Dependencias mínimas necesarias para FastAPI 0.110 + Pydantic 2.6 + Uvicorn 0.29
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps fastapi==0.110.0
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps starlette==0.37.2
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps uvicorn==0.29.0
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps click==8.1.8
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps h11==0.14.0
-
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps pydantic==2.6.4
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps pydantic-core==2.16.3
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps pydantic-settings==2.2.1
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps pydantic-extra-types==2.2.0
-
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps annotated-types==0.6.0
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps typing-inspection==0.3.0
-
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps python-dotenv==1.1.1 
-RUN pip install --no-cache-dir --index-url https://pypi.org/simple --no-deps aiosmtplib==1.1.6
-
-# ============================================================
-#   INSTALAR PyAV + faster-whisper
-# ============================================================
-RUN pip install --no-cache-dir av==10.0.0
-RUN pip install --no-cache-dir faster-whisper==1.2.1
+# Primero copiar requirements_clean.txt
+COPY requirements_clean.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # ============================================================
 #   COPIAR EL RESTO DEL PROYECTO
@@ -85,7 +97,7 @@ COPY . /app
 EXPOSE 8000
 
 # ============================================================
-#   CONFIGURACIÓN CUDA PARA JETSON
+#   CONFIGURACIÓN CUDA
 # ============================================================
 ENV CUDA_VISIBLE_DEVICES=0
 ENV NVIDIA_VISIBLE_DEVICES=all

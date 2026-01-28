@@ -3,7 +3,7 @@ from pathlib import Path
 from email.message import EmailMessage
 import aiosmtplib
 from dotenv import load_dotenv
-from modules.logging.logging_config import setup_logging
+from transcriber_app.modules.logging.logging_config import setup_logging
 
 # Logging
 logger = setup_logging("transcribeapp")

@@ -1,6 +1,10 @@
 # Entorno virtual
 venv/
+venv_transcriber/
 .env
+
+# logs
+transcriber_app/logs/*
 
 # Archivos generados por la app
 outputs/*
