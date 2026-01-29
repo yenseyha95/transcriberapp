@@ -2,147 +2,414 @@
 
 TranscriberApp es una herramienta modular diseñada para:
 
-- Transcribir audios mediante Whisper
-- Procesar textos directamente
-- Generar resúmenes avanzados usando Gemini (Google Generative AI)
-- Extraer tareas de reuniones (modo refinamiento)
-- Crear resúmenes técnicos, ejecutivos o en bullet points
-- Guardar resultados en formato Markdown
+- **Transcribir audios mediante Whisper** con aceleración GPU en Jetson  
+- **Procesar textos directamente** con análisis avanzado  
+- **Generar resúmenes inteligentes** usando Gemini  
+- **Extraer tareas de reuniones** (modo refinamiento)  
+- **Crear resúmenes técnicos, ejecutivos o en bullet points**  
+- **Guardar resultados en formato Markdown**  
+- **Ejecutar nativamente en Jetson con CUDA real**  
 
 ---
 
 ## 🚀 Características principales
 
-- **Transcripción automática** de archivos `.mp3`
-- **Procesamiento directo** de archivos `.txt`
-- **Modos de análisis**: técnico, refinamiento, ejecutivo, bullet, default
-- **Salida estructurada** en `outputs/`
-- **Transcripciones guardadas** en `transcripts/`
-- **Arquitectura modular y extensible**
+- **Transcripción automática** de archivos `.mp3` con Whisper acelerado por GPU  
+- **Procesamiento directo** de archivos `.txt`  
+- **Modos de análisis**: técnico, refinamiento, ejecutivo, bullet, default  
+- **Salida estructurada** en `outputs/`  
+- **Transcripciones guardadas** en `transcripts/`  
+- **Arquitectura modular y extensible**  
+- **Compatibilidad total con NVIDIA Jetson**  
+- **Wheels personalizados para PyTorch CUDA en JetPack 6.x**  
+- **Ejecución nativa optimizada para JetPack R36.x**  
 
 ---
 
-## 📦 Librerías utilizadas
+## 🖥️ Compatibilidad
 
-### Dependencias principales
+### **Entornos soportados:**
+- ✅ **NVIDIA Jetson** (Orin Nano, Xavier, AGX Orin)  
+- ✅ **JetPack 6.x (R36.x)**  
+- ✅ **Python 3.10**  
+- ✅ **CUDA 12.4 en el host**  
 
-- `google-generativeai` — Cliente oficial para modelos Gemini
-- `whisper` — Motor de transcripción de audio
-- `python-dotenv` — Carga de variables de entorno
-- `ffmpeg` — Requerido por Whisper para procesar audio
-- `tqdm` — Barras de progreso
-- `numpy` — Dependencia interna de Whisper
+### ⚠️ Nota importante sobre JetPack R36.4.7
 
-### Dependencias del sistema
+TranscriberApp funciona perfectamente en ejecución nativa.  
+No se recomienda el uso de contenedores en esta versión de JetPack debido a incompatibilidades con CUDA.
 
-Asegúrate de tener instalado:
+---
 
-```bash
-sudo apt install ffmpeg
+## 📦 Stack tecnológico
+
+### **Backend:**
+- **Whisper** (OpenAI)  
+- **PyTorch 2.3.0 + CUDA 12.4** (wheels personalizados para Jetson)  
+- **FastAPI**  
+- **Google Gemini API**  
+- **ONNX Runtime GPU**  
+
+### **Infraestructura:**
+- **Ejecución nativa en Jetson**  
+- **Entorno virtual Python 3.10**  
+
+---
+
+## 🏗️ Arquitectura del proyecto
+
 ```
-
 TranscriberApp/
 │
-├── audios/                     # Archivos .mp3 de entrada
-├── transcripts/                # Transcripciones generadas (.txt)
-├── outputs/                    # Resultados finales (.md)
+├── audios/                     
+├── transcripts/                
+├── outputs/                    
+├── wheels/                     
+│   ├── torch_cuda_jetpack-2.3.0-py3-none-any.whl
+│   ├── torchaudio-2.3.0+952ea74-cp310-cp310-linux_aarch64.whl
+│   ├── torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl
+│   ├── openai_whisper-20250625-py3-none-any.whl
+│   └── onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl
 │
 ├── transcriber_app/
-│   ├── main.py                 # Punto de entrada principal
+│   ├── main.py
 │   ├── modules/
-│   │   ├── audio_receiver.py   # Carga de audio
-│   │   ├── audio_downloader.py # Descarga de audio desde URL
-│   │   ├── transcriber.py      # Whisper
-│   │   ├── gemini_client.py    # Cliente Gemini
-│   │   ├── summarizer.py       # Lógica de resumen
-│   │   ├── output_formatter.py # Guardado de resultados
-│   │   ├── prompt_factory.py   # Prompts por modo
-│   │
 │   ├── runner/
-│       ├── orchestrator.py     # Orquestación del pipeline
+│   └── web/
 │
-├── venv/                       # Entorno virtual
-├── README.md
-└── .env                        # API key de Gemini
-
-### Crear entorno virtual:
-```bash
-python3 -m venv venv
-source venv/bin/activate
+├── requirements_clean.txt      
+├── requirements.txt            
+├── .env                        
+└── README.md
 ```
 
-### Instalar dependencias:
+---
+
+## ⚙️ Instalación (Ejecución nativa recomendada)
+
 ```bash
-pip install -r requirements.txt
+git clone <repositorio>
+cd TranscriberApp
+
+python3 -m venv venv_transcriber
+source venv_transcriber/bin/activate
+
+pip install -r requirements_clean.txt
+
+pip install wheels/torch_cuda_jetpack-2.3.0-py3-none-any.whl
+pip install wheels/torchaudio-2.3.0+952ea74-cp310-cp310-linux_aarch64.whl
+pip install wheels/torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl
+pip install wheels/openai_whisper-20250625-py3-none-any.whl
+pip install wheels/onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl
 ```
 
-### Crear archivo .env:
+Configurar API Key:
+
 ```bash
-GEMINI_API_KEY=TU_API_KEY_AQUI
+echo "GEMINI_API_KEY=TU_API_KEY" > .env
 ```
 
-## Modos disponibles
+---
+
+## 🎯 Modos disponibles
+
+| Modo | Descripción |
+|------|-------------|
+| `default` | Resumen general |
+| `tecnico` | Resumen técnico |
+| `refinamiento` | Tareas, backlog, decisiones |
+| `ejecutivo` | Resumen corto para dirección |
+| `bullet` | Puntos clave |
+
+---
+
+## 🚀 Ejecución
+
+### CLI
+
 ```bash
-Modo	        Descripción
-default	        Resumen simple
-tecnico	        Resumen técnico avanzado
-refinamiento	Extrae tareas, subtareas, decisiones y backlog
-ejecutivo	    Resumen ejecutivo de 5–8 líneas
-bullet	        Resumen en bullets
+python -m transcriber_app.main audio ejemplo tecnico
 ```
 
-# Ejecución
+### Web API
 
-## 1. Descargar audio desde una URL
 ```bash
-python transcriber_app/modules/audio_downloader.py "https://www.youtube.com/watch?v=XXXX"
+uvicorn transcriber_app.web.web_app:app --host 0.0.0.0 --port 8000
 ```
 
-## 2. Procesar un archivo de audio
-```bash
-python -m transcriber_app.main audio nombre_archivo modo
+Acceder a:
+
 ```
-## Ejemplo: 
-```bash
-python -m transcriber_app.main audio reunion1 tecnico
+http://localhost:8000
 ```
-Esto:
-- Carga audios/reunion1.mp3
 
-- Transcribe con Whisper
+---
 
-- Genera un resumen técnico
+## 📁 Estructura de salida
 
-- Guarda:  
--   transcripts/reunion1.txt  
--   outputs/reunion1_tecnico.md
-
-## 3. Procesar un archivo de texto
-```bash
-python -m transcriber_app.main texto nombre_archivo modo
 ```
-## Ejemplo: 
-```bash
-python -m transcriber_app.main texto sprint_refinement refinamiento
+transcripts/
+outputs/
 ```
-Esto:
 
-- Carga transcripts/sprint_refinement.txt
-- Genera backlog completo del refinamiento
-- Guarda:
--- outputs/sprint_refinement_refinamiento.md
+---
 
-## Notas importantes
-- No incluyas extensiones al ejecutar comandos (.mp3 o .txt se añaden automáticamente).
-- Los resultados siempre se guardan en outputs/.
-- Las transcripciones de audio se guardan en transcripts/.
+## 🧠 Configuración avanzada
 
-## Futuras mejoras
-- Exportación a JSON/YAML para Jira/Linear
-- Modo "acta de reunión"
-- Modo "resumen para email"
-- Interfaz web ligera
+Variables en `.env`:
 
-## Autor
-Proyecto desarrollado por Félix, optimizado para flujos reales de trabajo en entornos técnicos y productivos.
+```bash
+GEMINI_API_KEY=...
+MODEL_SIZE=base
+TARGET_LANG=es
+LOG_LEVEL=INFO
+```
 
+# 🌐 Acceso desde la red local (IMPORTANTE)
+
+Para acceder a la interfaz web de **TranscriberApp** desde cualquier PC, móvil o tablet dentro de la misma red local, es necesario usar **HTTPS**, ya que los navegadores bloquean el acceso al micrófono (`getUserMedia()`) en conexiones HTTP que no sean `localhost`.
+
+## ✔ Requisitos
+
+1. **Caddy** instalado como reverse proxy HTTPS  
+2. **Uvicorn** ejecutándose en el Jetson en `127.0.0.1:9000`  
+3. **Caddy** escuchando en el puerto **443** y redirigiendo a Uvicorn
+
+## ✔ Configuración de Caddy
+
+Archivo: `/etc/caddy/Caddyfile`
+
+```
+<IP_DEL_JETSON> {
+    reverse_proxy 127.0.0.1:9000
+}
+```
+
+Ejemplo:
+
+```
+192.168.0.105 {
+    reverse_proxy 127.0.0.1:9000
+}
+```
+
+Reiniciar Caddy:
+
+```
+sudo systemctl restart caddy
+```
+
+## ✔ Arranque de la aplicación
+
+El servidor FastAPI debe ejecutarse **solo en local**, sin HTTPS:
+
+```
+uvicorn transcriber_app.web.web_app:app \
+    --host 127.0.0.1 \
+    --port 9000
+```
+
+## ✔ Acceso desde otros dispositivos
+
+En cualquier navegador dentro de la red:
+
+```
+https://<IP_DEL_JETSON>
+```
+
+Ejemplo:
+
+```
+https://192.168.0.105
+```
+
+⚠ **No usar `:9000`**, ya que ese puerto no sirve HTTPS.
+
+## ✔ ¿Por qué es necesario?
+
+Los navegadores solo permiten usar el micrófono si la página se sirve desde:
+
+- `https://…`
+- `http://localhost`
+- `http://127.0.0.1`
+
+Por eso, para acceder desde otro PC o móvil, es obligatorio usar **HTTPS**.
+
+---
+
+## 🐛 Solución de problemas
+
+### PyTorch sin CUDA
+
+Instalar wheels personalizados.
+
+### Whisper lento
+
+Usar modelo más pequeño:
+
+```bash
+export MODEL_SIZE=tiny
+```
+
+### ONNX GPU no carga
+
+Verificar:
+
+```bash
+python -c "import onnxruntime as ort; print(ort.get_device())"
+```
+
+# 📌 Comandos útiles
+
+Este apartado reúne los comandos más importantes para trabajar con TranscriberApp en modo nativo sobre Jetson.
+
+---
+
+## 🎧 Descargar audio desde YouTube
+
+```bash
+python transcriber_app/modules/audio_downloader.py "URL_DEL_VIDEO"
+```
+
+Ejemplo:
+
+```bash
+python transcriber_app/modules/audio_downloader.py "https://youtu.be/osKyvYJ3PRM?si=LM23Iu92g0oxG8ox"
+```
+
+El archivo descargado se guarda en `audios/`.
+
+---
+
+## 🧠 Ejecutar el pipeline completo
+
+### Formato general
+
+```bash
+python -m transcriber_app.main [audio|texto] [nombre] [modo]
+```
+
+### Ejemplo (transcripción + resumen técnico)
+
+```bash
+python -m transcriber_app.main audio ejemplo1 tecnico
+```
+
+Esto genera:
+
+- `transcripts/ejemplo1.txt`  
+- `outputs/ejemplo1_tecnico.md`
+
+---
+
+## 🌐 Ejecutar la API web
+
+```bash
+uvicorn transcriber_app.web.web_app:app --host 0.0.0.0 --port 8000
+```
+
+Acceso:
+
+```
+http://localhost:8000
+```
+
+---
+
+## ▶️ Ejecutar la app con el script de arranque
+
+```bash
+./start.sh
+```
+
+Asegúrate de haber dado permisos:
+
+```bash
+chmod +x start.sh
+```
+
+---
+
+## 🔥 Matar procesos Python que se quedan colgados
+
+Listar procesos:
+
+```bash
+ps aux | grep python
+```
+
+Matar uno:
+
+```bash
+kill -9 PID
+```
+
+---
+
+## 🧪 Ejecutar tests
+
+```bash
+pytest -q
+```
+
+---
+
+## 🧹 Limpiar cachés de Python
+
+```bash
+find . -type d -name "__pycache__" -exec rm -r {} +
+```
+
+---
+
+## 🧩 Verificar CUDA y PyTorch en el host
+
+```bash
+python -c "import torch; print(torch.cuda.is_available())"
+```
+
+---
+
+## 📊 Rendimiento en Jetson Orin Nano
+
+| Componente | Tiempo | GPU |
+|------------|--------|-----|
+| Whisper base | 2–3 min | ~2GB |
+| Gemini | 5–10 s | <1GB |
+
+---
+
+## 🔄 Flujo típico
+
+1. Subir audio  
+2. Transcribir  
+3. Resumir  
+4. Exportar  
+
+---
+
+## 📈 Roadmap
+
+- Exportación a Jira  
+- Dashboard web  
+- Streaming  
+- Diarización  
+
+---
+
+## 🛡️ Seguridad
+
+- API keys en `.env`  
+- Datos locales  
+
+---
+
+## 📄 Licencia
+
+MIT
+
+---
+
+## ✨ Agradecimientos
+
+OpenAI, Google, NVIDIA, FastAPI, comunidad Jetson.

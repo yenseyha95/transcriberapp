@@ -1,6 +1,15 @@
 # Entorno virtual
 venv/
+venv_transcriber/
 .env
+
+# Ignore personal overrides
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+
+# logs
+transcriber_app/logs/*
 
 # Archivos generados por la app
 outputs/*

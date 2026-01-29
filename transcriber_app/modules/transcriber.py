@@ -8,7 +8,11 @@ IS_JETSON = os.path.exists('/etc/nv_tegra_release')
 if IS_JETSON:
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
+
 def ensure_wav(input_path: str) -> str:
+    """
+    Convierte cualquier formato de audio a WAV mono 16 kHz.
+    """
     tmp_wav = tempfile.mktemp(suffix=".wav")
 
     cmd = [
@@ -26,18 +30,27 @@ def ensure_wav(input_path: str) -> str:
 
 
 class Transcriber:
-    def __init__(self):
-        self.model = whisper.load_model("base", device="cuda")
+    def __init__(self, model_size="base"):
+        """
+        Carga el modelo openai-whisper.
+        En Jetson usa GPU si torch lo permite.
+        """
+        device = "cuda" if IS_JETSON else "cpu"
+
+        # Carga del modelo
+        self.model = whisper.load_model(model_size, device=device)
 
     def transcribe(self, audio_path: str) -> str:
+        """
+        Transcribe un archivo de audio usando openai-whisper.
+        """
         wav_path = ensure_wav(audio_path)
 
         result = self.model.transcribe(
             wav_path,
-            language=None,          # auto-detección
-            task="transcribe",
-            verbose=False,
-            fp16=True if IS_JETSON else False
+            language=None,   # autodetección
+            fp16=IS_JETSON   # Jetson soporta FP16
         )
 
-        return result["text"].strip()
+        text = result.get("text", "").strip()
+        return text
