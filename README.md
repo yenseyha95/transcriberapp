@@ -1,5 +1,7 @@
 # TranscriberApp
 
+![Imagen de muestra](https://raw.githubusercontent.com/FelixMarin/transcriberapp/refs/heads/feature/interfaz-web/screen.jpg)
+
 TranscriberApp es una herramienta modular diseñada para:
 
 - **Transcribir audios mediante Whisper** con aceleración GPU en Jetson  
@@ -385,10 +387,6 @@ python -c "import torch; print(torch.cuda.is_available())"
 2. Transcribir  
 3. Resumir  
 4. Exportar  
-
----
-
-![Imagen de muestra](https://raw.githubusercontent.com/FelixMarin/transcriberapp/refs/heads/feature/interfaz-web/screen.jpg)
 
 ---
 
