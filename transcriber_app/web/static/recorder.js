@@ -50,7 +50,7 @@ function startJobPolling(jobId) {
         running: "Procesando audio…",
         done: "Transcripción enviada por email.",
         error: "Error durante el procesamiento.",
-        unknown: "Job no encontrado."
+        unknown: "Job no encontrado."        
     };
 
     const checkStatus = async () => {
@@ -62,6 +62,34 @@ function startJobPolling(jobId) {
 
         if (data.status === "processing" || data.status === "running") {
             setTimeout(checkStatus, 3000);
+        } else {
+            // Si el backend devuelve el markdown en data.markdown o data.resultado
+            if (data.markdown || data.resultado || data.md) {
+                const md = data.markdown || data.resultado || data.md;
+                document.getElementById("mdResult").innerHTML = marked.parse(md);
+            } else {
+                const md = data.resultado_md || data.markdown || data.resultado || data.md;
+                if (md) {
+                    document.getElementById("mdResult").innerHTML = marked.parse(md);
+                } else {
+                    // Intentar cargar el archivo estandarizado
+                    const nombre = document.getElementById("nombre").value.trim();
+                    const modo = document.getElementById("modo").value.toLowerCase();
+                    const archivo = `${nombre}_${modo}.md`;
+
+                    try {
+                        const resMd = await fetch(`/api/resultados/${archivo}`);
+                        if (resMd.ok) {
+                            const markdown = await resMd.text();
+                            document.getElementById("mdResult").innerHTML = marked.parse(markdown);
+                        } else {
+                            document.getElementById("mdResult").innerHTML = "<p>No se pudo cargar el Markdown generado.</p>";
+                        }
+                    } catch (e) {
+                        document.getElementById("mdResult").innerHTML = "<p>Error al intentar cargar el Markdown.</p>";
+                    }
+                }
+            }
         }
     };
 

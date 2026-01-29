@@ -29,6 +29,13 @@ def create_app() -> FastAPI:
 
     # Servir archivos estáticos en /static
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+    
+    # Ruta absoluta al directorio outputs
+    OUTPUTS_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "outputs"))
+    print(">>> SERVING OUTPUTS FROM:", OUTPUTS_DIR)
+
+    # Servir archivos .md generados por el backend
+    app.mount("/api/resultados", StaticFiles(directory=OUTPUTS_DIR), name="resultados")
 
     # Ruta explícita para /
     @app.get("/")

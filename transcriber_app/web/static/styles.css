@@ -108,3 +108,36 @@ audio {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
+.markdown-body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+    color: #0077cc;
+    margin-top: 20px;
+}
+
+.markdown-body ul {
+    padding-left: 20px;
+}
+
+.markdown-body code {
+    background: #f0f0f0;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.markdown-body pre {
+    background: #f0f0f0;
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+}

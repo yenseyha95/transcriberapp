@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>TranscriberApp Web</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
@@ -55,56 +56,10 @@
 
     <section id="result">
         <h2>Resultado</h2>
-        <pre id="output"></pre>
+        <div id="mdResult" class="markdown-body"></div>
+        <pre id="output" style="display:none;"></pre>
     </section>
 
-    <script src="/static/recorder.js"></script>
-
-    <script>
-        // Polling para actualizar el estado del job
-        function startJobPolling(jobId) {
-            const output = document.getElementById("output");
-            const statusText = document.getElementById("status");
-
-            const mensajes = {
-                processing: "Procesando audio…",
-                running: "Procesando audio…",
-                done: "Transcripción enviada por email.",
-                error: "Error durante el procesamiento.",
-                unknown: "Job no encontrado."
-            };
-
-            const checkStatus = async () => {
-                const res = await fetch(`/api/status/${jobId}`);
-                const data = await res.json();
-
-                output.textContent = JSON.stringify(data, null, 2);
-
-                statusText.textContent = mensajes[data.status] || "Estado desconocido.";
-
-                if (data.status === "processing" || data.status === "running") {
-                    setTimeout(checkStatus, 3000);
-                }
-            };
-
-            checkStatus();
-        }
-
-        // Hook al botón de enviar para activar el polling
-        const originalSend = sendBtn.onclick;
-        sendBtn.onclick = async () => {
-            await originalSend();
-
-            try {
-                const data = JSON.parse(document.getElementById("output").textContent);
-                if (data.job_id) {
-                    startJobPolling(data.job_id);
-                }
-            } catch (e) {
-                console.error("No se pudo iniciar el polling:", e);
-            }
-        };
-    </script>
-
+    <script src="/static/recorder.js?v=3"></script>
 </body>
 </html>
