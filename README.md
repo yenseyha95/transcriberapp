@@ -165,6 +165,76 @@ TARGET_LANG=es
 LOG_LEVEL=INFO
 ```
 
+# 🌐 Acceso desde la red local (IMPORTANTE)
+
+Para acceder a la interfaz web de **TranscriberApp** desde cualquier PC, móvil o tablet dentro de la misma red local, es necesario usar **HTTPS**, ya que los navegadores bloquean el acceso al micrófono (`getUserMedia()`) en conexiones HTTP que no sean `localhost`.
+
+## ✔ Requisitos
+
+1. **Caddy** instalado como reverse proxy HTTPS  
+2. **Uvicorn** ejecutándose en el Jetson en `127.0.0.1:9000`  
+3. **Caddy** escuchando en el puerto **443** y redirigiendo a Uvicorn
+
+## ✔ Configuración de Caddy
+
+Archivo: `/etc/caddy/Caddyfile`
+
+```
+<IP_DEL_JETSON> {
+    reverse_proxy 127.0.0.1:9000
+}
+```
+
+Ejemplo:
+
+```
+192.168.0.105 {
+    reverse_proxy 127.0.0.1:9000
+}
+```
+
+Reiniciar Caddy:
+
+```
+sudo systemctl restart caddy
+```
+
+## ✔ Arranque de la aplicación
+
+El servidor FastAPI debe ejecutarse **solo en local**, sin HTTPS:
+
+```
+uvicorn transcriber_app.web.web_app:app \
+    --host 127.0.0.1 \
+    --port 9000
+```
+
+## ✔ Acceso desde otros dispositivos
+
+En cualquier navegador dentro de la red:
+
+```
+https://<IP_DEL_JETSON>
+```
+
+Ejemplo:
+
+```
+https://192.168.0.105
+```
+
+⚠ **No usar `:9000`**, ya que ese puerto no sirve HTTPS.
+
+## ✔ ¿Por qué es necesario?
+
+Los navegadores solo permiten usar el micrófono si la página se sirve desde:
+
+- `https://…`
+- `http://localhost`
+- `http://127.0.0.1`
+
+Por eso, para acceder desde otro PC o móvil, es obligatorio usar **HTTPS**.
+
 ---
 
 ## 🐛 Solución de problemas

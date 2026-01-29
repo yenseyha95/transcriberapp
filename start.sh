@@ -30,7 +30,8 @@ echo "🌐 Servidor disponible en: http://127.0.0.1:9000"
 
 # Ejecutar FastAPI con Uvicorn usando el mismo comando que funciona
 exec "$PYTHON_BIN" -m uvicorn "$MAIN_APP" \
-  --host 0.0.0.0 \
+  --host 127.0.0.1 \
   --port 9000 \
   --log-level debug
+
 
