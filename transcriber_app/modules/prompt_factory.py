@@ -1,4 +1,6 @@
+# transcriber_app/modules/prompt_factory.py
 from transcriber_app.modules.logging.logging_config import setup_logging
+from transcriber_app.config import LANGUAGE
 
 # Logging
 logger = setup_logging("transcribeapp")
@@ -6,7 +8,7 @@ logger = setup_logging("transcribeapp")
 class PromptFactory:
     AVAILABLE_MODES = ["default", "tecnico", "refinamiento", "ejecutivo", "bullet"]
 
-    def __init__(self, target_lang="es"):
+    def __init__(self, target_lang=LANGUAGE):
         logger.info(f"[PROMPT FACTORY] Inicializando con idioma objetivo: {target_lang}")
         self.lang = target_lang
 
@@ -100,3 +102,22 @@ Resume el siguiente texto en {self.lang} de forma clara y concisa:
 
         # Si el modo no existe, usar "default"
         return prompts.get(mode, prompts["default"])
+
+    def get_chat_prompt(self, transcripcion: str, resumen: str, pregunta: str) -> str:
+        return f"""
+Eres un asistente experto. Responde SIEMPRE en {self.lang}.
+Usa la transcripción original y el resumen procesado para responder
+la pregunta del usuario de forma clara, útil y precisa.
+
+=== TRANSCRIPCIÓN ORIGINAL ===
+{transcripcion}
+
+=== RESUMEN PROCESADO ===
+{resumen}
+
+=== PREGUNTA DEL USUARIO ===
+{pregunta}
+
+=== RESPUESTA EN {self.lang.upper()} ===
+"""
+

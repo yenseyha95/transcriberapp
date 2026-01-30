@@ -298,3 +298,74 @@ document.querySelectorAll(".collapsible").forEach(header => {
         }
     });
 });
+
+// -----------------------------
+// Panel lateral del chat
+// -----------------------------
+const chatToggle = document.getElementById("chatToggle");
+const chatPanel = document.getElementById("chatPanel");
+const chatClose = document.getElementById("chatClose");
+
+chatToggle.onclick = () => {
+    chatPanel.classList.add("open");
+};
+
+chatClose.onclick = () => {
+    chatPanel.classList.remove("open");
+};
+
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const chatSend = document.getElementById("chatSend");
+
+function addMessage(text, sender="user") {
+    const div = document.createElement("div");
+    div.className = sender === "user" ? "msg-user" : "msg-ai";
+    div.textContent = text;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+chatSend.onclick = () => {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    addMessage(msg, "user");
+    chatInput.value = "";
+
+    // Aquí luego llamaremos al backend
+    addMessage("Procesando pregunta…", "ai");
+};
+
+async function enviarPreguntaAlModelo(pregunta) {
+    const transcripcion = document.getElementById("transcripcionTexto").textContent;
+    const resumen = document.getElementById("mdResult").textContent;
+
+    const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            transcripcion,
+            resumen,
+            pregunta
+        })
+    });
+
+    const data = await res.json();
+    return data.respuesta;
+}
+
+chatSend.onclick = async () => {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    addMessage(msg, "user");
+    chatInput.value = "";
+
+    addMessage("Pensando…", "ai");
+
+    const respuesta = await enviarPreguntaAlModelo(msg);
+
+    const last = chatMessages.lastChild;
+    last.textContent = respuesta;
+};

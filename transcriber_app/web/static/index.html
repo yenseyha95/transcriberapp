@@ -73,6 +73,24 @@
         <pre id="output" style="display:none;"></pre>
     </section>
 
-    <script src="/static/recorder.js?v=4"></script>
+    <!-- Botón hamburguesa -->
+    <div id="chatToggle" class="chat-toggle">☰</div>
+
+    <!-- Panel lateral del chat -->
+    <div id="chatPanel" class="chat-panel">
+        <div class="chat-header">
+            <h3>Asistente IA</h3>
+            <button id="chatClose" class="chat-close">×</button>
+        </div>
+
+        <div id="chatMessages" class="chat-messages"></div>
+
+        <div class="chat-input-container">
+            <input id="chatInput" type="text" placeholder="Preguntar sobre la transcripción…" />
+            <button id="chatSend">Enviar</button>
+        </div>
+    </div>
+
+    <script src="/static/recorder.js?v=5"></script>
 </body>
 </html>

@@ -1,6 +1,8 @@
 #transcriber_app/web/api/routes.py
 from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks, HTTPException
+from .models import ChatRequest
 from pathlib import Path
+from ...modules.gemini_client import chat_about_transcript
 import uuid
 
 from .background import process_audio_job
@@ -63,3 +65,12 @@ def get_status(job_id: str):
     logger.info(f"[API ROUTE] Consultando estado del job: {job_id}")
     status = JOB_STATUS.get(job_id, "unknown")
     return {"job_id": job_id, "status": status}
+
+@router.post("/chat")
+async def chat_endpoint(payload: ChatRequest):
+    respuesta = await chat_about_transcript(
+        transcripcion=payload.transcripcion,
+        resumen=payload.resumen,
+        pregunta=payload.pregunta
+    )
+    return {"respuesta": respuesta}
