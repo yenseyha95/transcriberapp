@@ -22,5 +22,4 @@ audios/*
 __pycache__/
 *.pyc
 
-transcriber_app/modules/emails.py
 wheels/
