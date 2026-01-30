@@ -1,9 +1,49 @@
+# pyproject.toml
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "transcriber_app"
-version = "0.1.0"
-description = "TranscriberApp"
+version = "1.0.0"
+authors = [
+    {name = "Félix Marín", email = "felixmurcia@gmail.com"}
+]
+description = "Aplicación de transcripción y análisis de audio con IA"
+readme = "README.md"
 requires-python = ">=3.10"
+license = {text = "MIT"}
 
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+]
+
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.0",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8>=6.0.0",
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/FelixMarin/transcriberapp"
+Repository = "https://github.com/FelixMarin/transcriberapp"
+"Issue Tracker" = "https://github.com/FelixMarin/transcriberapp/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["transcriber_app*"]
+exclude = ["tests*", "test*", "docs*"]
