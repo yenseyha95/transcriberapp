@@ -307,3 +307,25 @@ audio {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.resultado-procesado {
+    position: relative;
+}
+
+.btn-imprimir {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 10;
+}
+
+.btn-imprimir:hover {
+    background-color: #0056b3;
+}

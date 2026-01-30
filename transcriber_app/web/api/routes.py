@@ -1,8 +1,9 @@
 #transcriber_app/web/api/routes.py
 from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks, HTTPException
+from fastapi.responses import StreamingResponse
 from .models import ChatRequest
 from pathlib import Path
-from ...modules.gemini_client import chat_about_transcript
+from ...modules.gemini_client import chat_about_transcript, stream_chat_about_transcript
 import uuid
 
 from .background import process_audio_job
@@ -76,3 +77,15 @@ async def chat_endpoint(payload: ChatRequest):
     )
     return {"respuesta": respuesta}
 
+@router.post("/chat/stream")
+async def chat_stream(payload: ChatRequest):
+    async def event_generator():
+        async for chunk in stream_chat_about_transcript(
+            payload.transcripcion,
+            payload.resumen,
+            payload.pregunta,
+            [m.dict() for m in payload.historial]
+        ):
+            yield chunk
+
+    return StreamingResponse(event_generator(), media_type="text/plain")

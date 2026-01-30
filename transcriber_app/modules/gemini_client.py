@@ -29,6 +29,18 @@ async def chat_about_transcript(transcripcion: str, resumen: str, pregunta: str)
 
     return response.text
 
+async def stream_chat_about_transcript(transcripcion, resumen, pregunta, historial):
+    factory = PromptFactory(target_lang=LANGUAGE)
+    prompt = factory.get_chat_prompt(transcripcion, resumen, pregunta, historial)
+
+    model = genai.GenerativeModel(USE_MODEL)
+
+    response = model.generate_content(prompt, stream=True)
+
+    for chunk in response:
+        if chunk.text:
+            yield chunk.text
+
 async def chat_about_transcript(
     transcripcion: str,
     resumen: str,

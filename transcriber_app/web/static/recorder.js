@@ -74,6 +74,7 @@ function startJobPolling(jobId) {
         if (data.status === "processing" || data.status === "running") {
             setTimeout(checkStatus, 3000);
         } else {
+            hideOverlay();
             // Si el backend devuelve el markdown en data.markdown o data.resultado
             if (data.markdown || data.resultado || data.md) {
                 const md = data.markdown || data.resultado || data.md;
@@ -250,8 +251,8 @@ sendBtn.onclick = async () => {
         console.error("Error al enviar audio:", err);
         alert("Error al enviar el audio o iniciar el procesamiento.");
     } finally {
-        // 🔥 Desbloquear la interfaz SIEMPRE
-        hideOverlay();
+        // ❌ NO ocultar aquí
+        // hideOverlay();
     }
 };
 
@@ -346,7 +347,7 @@ const chatSend = document.getElementById("chatSend");
 function addMessage(text, sender = "user", returnNode = false) {
     const div = document.createElement("div");
     div.className = sender === "user" ? "msg-user" : "msg-ai";
-    div.textContent = text;
+    div.innerHTML = formatAsHTML(text);
     chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     return returnNode ? div : null;
@@ -380,18 +381,25 @@ chatSend.onclick = async () => {
 
     chatHistory.push({ role: "user", content: msg });
 
-    const thinkingMsg = addMessage("Pensando…", "ai", true);
+    const aiMsg = addMessage("", "ai", true);
 
-    showOverlay(); // 🔥 Bloquea la interfaz
+    showOverlay();
 
     try {
-        const respuesta = await enviarPreguntaAlModelo(msg);
-        thinkingMsg.textContent = respuesta;
-        chatHistory.push({ role: "assistant", content: respuesta });
+        let textoFinal = "";
+
+        for await (const parcial of enviarPreguntaStreaming(msg)) {
+            hideOverlay();
+            aiMsg.innerHTML = formatAsHTML(parcial);
+            textoFinal = parcial;
+        }
+
+        chatHistory.push({ role: "assistant", content: textoFinal });
+
     } catch (e) {
-        thinkingMsg.textContent = "Error al procesar la respuesta.";
+        aiMsg.innerHTML = formatAsHTML("Error al procesar la respuesta.");
     } finally {
-        hideOverlay(); // 🔥 Desbloquea la interfaz
+        hideOverlay();
     }
 };
 
@@ -432,3 +440,79 @@ function updateSendButtonState() {
     sendBtn.disabled = !puedeEnviar;
     sendBtn.classList.toggle("disabled", !puedeEnviar);
 }
+
+// -----------------------------
+// Streaming de la respuesta del modelo
+// -----------------------------
+async function* enviarPreguntaStreaming(pregunta) {
+    const transcripcion = document.getElementById("transcripcionTexto").textContent;
+    const resumen = document.getElementById("mdResult").textContent;
+
+    const res = await fetch("/api/chat/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            transcripcion,
+            resumen,
+            pregunta,
+            historial: chatHistory
+        })
+    });
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let texto = "";
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        texto += decoder.decode(value, { stream: true });
+        yield texto; // ahora sí funciona
+    }
+}
+
+// -----------------------------
+// Formatear texto como HTML
+// -----------------------------
+function formatAsHTML(text) {
+    // Escapar HTML básico
+    const escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+    // Convertir saltos de línea en <br>
+    const withBreaks = escaped.replace(/\n/g, "<br>");
+
+    // Convertir listas numeradas y con viñetas en <ul>/<ol>
+    const formatted = withBreaks
+        .replace(/•\s/g, "•&nbsp;") // viñetas
+        .replace(/^\d+\.\s/gm, match => `<strong>${match}</strong>`); // numeradas
+
+    return formatted;
+}
+
+// -----------------------------
+// Imprimir PDF
+// -----------------------------
+document.getElementById("btnImprimirPDF").onclick = () => {
+    const contenido = document.getElementById("mdResult").innerHTML;
+
+    const ventana = window.open("", "_blank");
+    ventana.document.write(`
+        <html>
+            <head>
+                <title>Resumen Técnico</title>
+                <style>
+                    body { font-family: sans-serif; padding: 20px; }
+                    h1, h2, h3 { color: #333; }
+                    p, li { line-height: 1.6; }
+                </style>
+            </head>
+            <body>${contenido}</body>
+        </html>
+    `);
+    ventana.document.close();
+    ventana.print();
+};
