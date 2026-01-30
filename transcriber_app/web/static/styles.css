@@ -260,3 +260,16 @@ audio {
     margin-bottom: 6px;
     border-radius: 6px;
 }
+
+.chat-toggle.hidden {
+    display: none;
+}
+
+#transcripcionTexto {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    padding: 12px;
+    box-sizing: border-box;
+}

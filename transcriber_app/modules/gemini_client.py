@@ -4,6 +4,7 @@ import google.generativeai as genai
 from transcriber_app.modules.prompt_factory import PromptFactory
 from transcriber_app.modules.logging.logging_config import setup_logging
 from transcriber_app.config import GEMINI_API_KEY, USE_MODEL, LANGUAGE
+from typing import List, Dict
 
 # Logging
 logger = setup_logging("transcribeapp")
@@ -28,6 +29,19 @@ async def chat_about_transcript(transcripcion: str, resumen: str, pregunta: str)
 
     return response.text
 
+async def chat_about_transcript(
+    transcripcion: str,
+    resumen: str,
+    pregunta: str,
+    historial: List[Dict] | None = None,
+) -> str:
+    factory = PromptFactory(target_lang=LANGUAGE)
+    prompt = factory.get_chat_prompt(transcripcion, resumen, pregunta, historial)
+
+    model = genai.GenerativeModel(USE_MODEL)
+    response = model.generate_content(prompt)
+
+    return response.text
 
 # -----------------------------
 # CLIENTE PRINCIPAL PARA RESÚMENES

@@ -103,21 +103,41 @@ Resume el siguiente texto en {self.lang} de forma clara y concisa:
         # Si el modo no existe, usar "default"
         return prompts.get(mode, prompts["default"])
 
-    def get_chat_prompt(self, transcripcion: str, resumen: str, pregunta: str) -> str:
+    def get_chat_prompt(
+        self,
+        transcripcion: str,
+        resumen: str,
+        pregunta: str,
+        historial: list[dict] | None = None,
+    ) -> str:
+        historial = historial or []
+
+        historial_texto = ""
+        if historial:
+            partes = []
+            for h in historial:
+                rol = "USUARIO" if h["role"] == "user" else "ASISTENTE"
+                partes.append(f"{rol}: {h['content']}")
+            historial_texto = "\n".join(partes)
+
         return f"""
 Eres un asistente experto. Responde SIEMPRE en {self.lang}.
-Usa la transcripción original y el resumen procesado para responder
-la pregunta del usuario de forma clara, útil y precisa.
+Usa la transcripción original y el resumen procesado como contexto principal.
 
-=== TRANSCRIPCIÓN ORIGINAL ===
+=== CONTEXTO DE LA REUNIÓN ===
+[TRANSCRIPCIÓN]
 {transcripcion}
 
-=== RESUMEN PROCESADO ===
+[RESUMEN]
 {resumen}
 
-=== PREGUNTA DEL USUARIO ===
+=== HISTORIAL DE LA CONVERSACIÓN ===
+{historial_texto if historial_texto else "Sin mensajes previos."}
+
+=== PREGUNTA ACTUAL DEL USUARIO ===
 {pregunta}
 
 === RESPUESTA EN {self.lang.upper()} ===
 """
+
 

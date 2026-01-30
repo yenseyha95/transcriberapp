@@ -10,10 +10,17 @@ const downloadBtn = document.getElementById("downloadBtn");
 const statusText = document.getElementById("status");
 const preview = document.getElementById("preview");
 const output = document.getElementById("output");
+const uploadBtn = document.getElementById("uploadBtn");
+const fileInput = document.getElementById("fileInput");
+const chatToggle = document.getElementById("chatToggle");
+const chatPanel = document.getElementById("chatPanel");
+const chatClose = document.getElementById("chatClose");
 
 document.getElementById("nombre").oninput = validateForm;
 document.getElementById("email").oninput = validateForm;
 document.getElementById("modo").onchange = validateForm;
+
+let chatHistory = [];
 
 // -----------------------------
 // Protección contra cerrar/refrescar
@@ -122,6 +129,10 @@ function startJobPolling(jobId) {
                         document.getElementById("transcripcionTexto").textContent =
                             "Error al cargar la transcripción original.";
                     }
+                    // Reset del historial del chat al cargar una nueva transcripción
+                    chatPanel.classList.remove("open");
+                    chatHistory = [];
+                    chatMessages.innerHTML = "";
                 }
             }
         }
@@ -254,9 +265,6 @@ deleteBtn.onclick = () => {
     validateForm();
 };
 
-const uploadBtn = document.getElementById("uploadBtn");
-const fileInput = document.getElementById("fileInput");
-
 // -----------------------------
 // Cargar grabación desde archivo
 // -----------------------------
@@ -302,40 +310,28 @@ document.querySelectorAll(".collapsible").forEach(header => {
 // -----------------------------
 // Panel lateral del chat
 // -----------------------------
-const chatToggle = document.getElementById("chatToggle");
-const chatPanel = document.getElementById("chatPanel");
-const chatClose = document.getElementById("chatClose");
-
 chatToggle.onclick = () => {
     chatPanel.classList.add("open");
+    chatToggle.classList.add("hidden");
 };
 
 chatClose.onclick = () => {
     chatPanel.classList.remove("open");
+    chatToggle.classList.remove("hidden");
 };
 
 const chatMessages = document.getElementById("chatMessages");
 const chatInput = document.getElementById("chatInput");
 const chatSend = document.getElementById("chatSend");
 
-function addMessage(text, sender="user") {
+function addMessage(text, sender = "user", returnNode = false) {
     const div = document.createElement("div");
     div.className = sender === "user" ? "msg-user" : "msg-ai";
     div.textContent = text;
     chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+    return returnNode ? div : null;
 }
-
-chatSend.onclick = () => {
-    const msg = chatInput.value.trim();
-    if (!msg) return;
-
-    addMessage(msg, "user");
-    chatInput.value = "";
-
-    // Aquí luego llamaremos al backend
-    addMessage("Procesando pregunta…", "ai");
-};
 
 async function enviarPreguntaAlModelo(pregunta) {
     const transcripcion = document.getElementById("transcripcionTexto").textContent;
@@ -347,7 +343,8 @@ async function enviarPreguntaAlModelo(pregunta) {
         body: JSON.stringify({
             transcripcion,
             resumen,
-            pregunta
+            pregunta,
+            historial: chatHistory
         })
     });
 
@@ -362,10 +359,17 @@ chatSend.onclick = async () => {
     addMessage(msg, "user");
     chatInput.value = "";
 
-    addMessage("Pensando…", "ai");
+    // Añadir al historial
+    chatHistory.push({ role: "user", content: msg });
+
+    const thinkingMsg = addMessage("Pensando…", "ai", true);
 
     const respuesta = await enviarPreguntaAlModelo(msg);
 
-    const last = chatMessages.lastChild;
-    last.textContent = respuesta;
+    // Reemplazar el "Pensando…" por la respuesta real
+    thinkingMsg.textContent = respuesta;
+
+    // Añadir respuesta al historial
+    chatHistory.push({ role: "assistant", content: respuesta });
 };
+

@@ -71,6 +71,8 @@ async def chat_endpoint(payload: ChatRequest):
     respuesta = await chat_about_transcript(
         transcripcion=payload.transcripcion,
         resumen=payload.resumen,
-        pregunta=payload.pregunta
+        pregunta=payload.pregunta,
+        historial=[m.dict() for m in payload.historial],
     )
     return {"respuesta": respuesta}
+
