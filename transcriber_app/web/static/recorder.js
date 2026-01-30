@@ -108,12 +108,15 @@ function startJobPolling(jobId) {
                             const markdown = await resMd.text();
                             document.getElementById("mdResult").innerHTML = marked.parse(markdown);
                             document.getElementById("result").style.display = "block";
+                            document.getElementById("btnImprimirPDF").style.display = "inline-block";
                             updateSendButtonState();
                         } else {
+                            document.getElementById("btnImprimirPDF").style.display = "none";
                             document.getElementById("mdResult").innerHTML =
                                 "<p>No se pudo cargar el Markdown generado.</p>";
                         }
                     } catch (e) {
+                        document.getElementById("btnImprimirPDF").style.display = "none";
                         document.getElementById("mdResult").innerHTML =
                             "<p>Error al intentar cargar el Markdown.</p>";
                     }
