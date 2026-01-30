@@ -1,4 +1,4 @@
-![Imagen de muestra](https://raw.githubusercontent.com/FelixMarin/transcriberapp/refs/heads/feature/interfaz-web/screen.jpg)
+![Imagen de muestra](https://raw.githubusercontent.com/FelixMarin/transcriberapp/refs/heads/main/screen.jpg)
 
 ---
 
