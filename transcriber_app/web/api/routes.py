@@ -1,4 +1,5 @@
 # transcriber_app/web/api/routes.py
+import os
 from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks, HTTPException
 from pathlib import Path
 from transcriber_app.modules.ai.ai_manager import AIManager, log_agent_result
@@ -10,6 +11,8 @@ from transcriber_app.modules.logging.logging_config import setup_logging
 
 # Logging
 logger = setup_logging("transcribeapp")
+
+RECORDINGS_DIR = "recordings"
 
 router = APIRouter()
 
@@ -78,3 +81,10 @@ async def chat_stream(payload: dict):
     log_agent_result(result)
 
     return {"response": result.content}
+
+
+@router.get("/check-name")
+def check_name(name: str):
+    filename = f"{name}.mp3"
+    exists = os.path.exists(os.path.join(RECORDINGS_DIR, filename))
+    return {"exists": exists}

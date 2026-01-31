@@ -545,3 +545,30 @@ document.getElementById("btnImprimirPDF").onclick = () => {
     ventana.document.close();
     ventana.print();
 };
+
+// -----------------------------
+// Validar nombre de grabación único
+// -----------------------------
+async function validateName(name) {
+    const warning = document.getElementById("name-warning");
+
+    if (!name.trim()) {
+        warning.style.display = "none";
+        return;
+    }
+
+    try {
+        const res = await fetch(`/check-name?name=${encodeURIComponent(name)}`);
+        const data = await res.json();
+
+        if (data.exists) {
+            warning.textContent = "⚠ Ya existe una grabación con ese nombre";
+            warning.style.display = "block";
+        } else {
+            warning.style.display = "none";
+        }
+    } catch (err) {
+        console.error("Error comprobando nombre:", err);
+    }
+}
+
