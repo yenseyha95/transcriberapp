@@ -1,9 +1,10 @@
-from .agents.tecnico_agent import tecnico_agent
-from .agents.ejecutivo_agent import ejecutivo_agent
-from .agents.refinamiento_agent import refinamiento_agent
-from .agents.bullet_agent import bullet_agent
-from .agents.default_agent import default_agent
+# transcriber_app/modules/ai/ai_manager.py
+
 from transcriber_app.modules.logging.logging_config import setup_logging
+
+# Importar el modelo Gemini (que internamente gestiona sus agentes)
+from transcriber_app.modules.ai.gemini.client import GeminiModel
+
 
 # Logging
 logger = setup_logging("transcribeapp")
@@ -58,27 +59,39 @@ def log_agent_result(result):
 
 
 class AIManager:
+    """
+    Router central de modelos de IA.
+    Cada modelo implementa la interfaz AIModel y gestiona sus propios agentes.
+    """
 
-    agents = {
-        "tecnico": tecnico_agent,
-        "ejecutivo": ejecutivo_agent,
-        "refinamiento": refinamiento_agent,
-        "bullet": bullet_agent,
-        "default": default_agent,
+    models = {
+        "gemini": GeminiModel(),
+        # En el futuro:
+        # "openai": OpenAIModel(),
+        # "mistral": MistralModel(),
     }
 
     @staticmethod
-    def get_agent(mode: str):
-        return AIManager.agents.get(mode, default_agent)
+    def get_model(model_name: str = "gemini"):
+        """
+        Devuelve el modelo solicitado. Por defecto, Gemini.
+        """
+        return AIManager.models.get(model_name, AIManager.models["gemini"])
 
     @staticmethod
-    def summarize(text: str, mode: str):
-        agent = AIManager.get_agent(mode)
-        return agent.run(text)
+    def summarize(text: str, mode: str, model_name: str = "gemini"):
+        """
+        Ejecuta un agente del modelo seleccionado.
+        """
+        model = AIManager.get_model(model_name)
+        return model.run_agent(mode, text)
 
     @staticmethod
-    def summarize_stream(text, mode="default"):
-        agent = AIManager.get_agent(mode)
+    def summarize_stream(text: str, mode: str = "default", model_name: str = "gemini"):
+        """
+        Versión en streaming del agente.
+        """
+        model = AIManager.get_model(model_name)
 
-        for chunk in agent._run_stream(text):
+        for chunk in model.run_agent(mode, text, stream=True):
             yield chunk
