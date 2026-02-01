@@ -7,6 +7,8 @@ let lastRecordingName = null;
 let hasTranscript = false;
 let lastRecordingDuration = null;
 let chatHistory = [];
+let ultimoModoProcesado = null;
+
 
 // Cache de elementos DOM - ACTUALIZADO para coincidir con el nuevo HTML
 const elements = {
@@ -59,6 +61,16 @@ const elements = {
     transcriptionContent: document.getElementById("transcriptionContent"),
     resultContent: document.getElementById("resultContent")
 };
+
+elements.modo.addEventListener("change", () => {
+    const modoActual = elements.modo.value;
+
+    if (modoActual === ultimoModoProcesado) {
+        elements.sendBtn.disabled = true;
+    } else {
+        elements.sendBtn.disabled = false;
+    }
+});
 
 // Verificar que todos los elementos existen
 function validateElements() {
@@ -554,6 +566,10 @@ async function loadFromFiles() {
                 if (resultSection) resultSection.hidden = false;
                 if (elements.btnImprimirPDF) elements.btnImprimirPDF.style.display = "inline-block";
             }
+
+            ultimoModoProcesado = modo;
+            elements.sendBtn.disabled = true;
+
             return markdown;
         }
     } catch (e) {
