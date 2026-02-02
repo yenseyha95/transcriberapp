@@ -277,6 +277,8 @@ function handleRecordingStop() {
         elements.preview.hidden = false;
     }
 
+    if (elements.recordBtn) elements.recordBtn.disabled = true;
+
     validateForm();
     if (elements.deleteBtn) elements.deleteBtn.disabled = false;
     if (elements.downloadBtn) elements.downloadBtn.disabled = false;
@@ -324,6 +326,7 @@ function setupFileHandlers() {
             if (elements.sendBtn) elements.sendBtn.disabled = true;
             if (elements.deleteBtn) elements.deleteBtn.disabled = true;
             if (elements.downloadBtn) elements.downloadBtn.disabled = true;
+            if (elements.recordBtn) elements.recordBtn.disabled = false;
 
             if (elements.statusText) elements.statusText.textContent = "Grabación borrada.";
             validateForm();
@@ -350,6 +353,7 @@ function setupFileHandlers() {
             validateForm();
             if (elements.deleteBtn) elements.deleteBtn.disabled = false;
             if (elements.downloadBtn) elements.downloadBtn.disabled = false;
+            if (elements.recordBtn) elements.recordBtn.disabled = true;
             if (elements.statusText) elements.statusText.textContent = `Grabación cargada: ${file.name}`;
         };
     }
@@ -569,6 +573,7 @@ async function loadFromFiles() {
 
             ultimoModoProcesado = modo;
             elements.sendBtn.disabled = true;
+            elements.recordBtn.disabled = true;
 
             return markdown;
         }
