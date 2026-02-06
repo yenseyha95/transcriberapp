@@ -7,7 +7,7 @@ import { addProcessedMode, getProcessedModes, resetProcessedModes, setCurrentSes
 import { addMessage, clearChatHistory } from "./chat.js";
 import { elements } from "./domElements.js";
 import { getFormValues, setFormName, validateSessionName } from "./form.js";
-import { getAllTranscriptions, getTranscriptionById } from "./historyStorage.js";
+import { deleteTranscription, getAllTranscriptions, getTranscriptionById } from "./historyStorage.js";
 import { clearTranscriptionAndResults, updateRecordingButtonsState, updateSendButtonState } from "./ui.js";
 import { parseMarkdown, reconstructBlob } from "./utils.js";
 
@@ -44,7 +44,8 @@ async function loadHistoryItems() {
 
                 const textSpan = document.createElement("span");
                 const fecha = new Date(item.fecha).toLocaleString();
-                textSpan.textContent = `${item.nombre} (${fecha})`;
+                textSpan.textContent = item.nombre; // Solo el nombre
+                textSpan.title = `Fecha: ${fecha}`; // Tooltip estético
                 textSpan.style = "flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;";
                 textSpan.onclick = () => loadTranscriptionFromHistory(item.id);
 
