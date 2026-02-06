@@ -9,20 +9,24 @@ import { normalizeText } from "./utils.js";
 /**
  * Procesa una transcripción existente con un nuevo modo
  */
-async function processExistingTranscription(nombre, modo) {
+async function processExistingTranscription(nombre, modo, transcription = null) {
     const formData = new FormData();
     formData.append("nombre", nombre);
     formData.append("modo", modo);
 
+    if (transcription) {
+        formData.append("transcription", transcription);
+    }
+
     showOverlay();
 
     try {
-        const res = await fetch("/api/process-existing", {
+        const response = await fetch("/api/process-existing", {
             method: "POST",
             body: formData
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
         if (data.status === "done") {
             // Si el backend no devuelve el contenido directamente, lo buscamos

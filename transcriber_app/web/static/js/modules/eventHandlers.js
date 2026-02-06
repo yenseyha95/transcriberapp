@@ -172,7 +172,9 @@ async function handleSendAudio() {
 
     // CASO 1: Ya existe transcripción → reutilizar
     if (getHasTranscript() && getLastRecordingName() === nombre) {
-        const result = await processExistingTranscription(nombre, modo);
+        // Intentar obtener el texto de la transcripción actual para mandarlo al back (si ya no hay archivos)
+        const currentTranscript = elements.transcripcionTexto?.innerText || "";
+        const result = await processExistingTranscription(nombre, modo, currentTranscript);
 
         if (result.success) {
             // Actualizar UI principal

@@ -9,11 +9,12 @@ logger = setup_logging("transcribeapp")
 
 
 class Orchestrator:
-    def __init__(self, receiver, transcriber, formatter):
+    def __init__(self, receiver, transcriber, formatter, save_files=True):
         self.receiver = receiver
         self.transcriber = transcriber
         self.formatter = formatter
-        logger.info("[ORCHESTRATOR] Orchestrator inicializado con componentes.")
+        self.save_files = save_files
+        logger.info(f"[ORCHESTRATOR] Orchestrator inicializado con componentes (save_files={save_files}).")
 
     def run_audio(self, audio_path, mode="default"):
         logger.info(f"[ORCHESTRATOR] Ejecutando flujo de audio para: {audio_path} con modo: {mode}")
@@ -27,7 +28,7 @@ class Orchestrator:
 
         # 3. Guardar transcripción
         safe_name = audio_info["name"].lower()
-        self.formatter.save_transcription(safe_name, text)
+        self.formatter.save_transcription(safe_name, text, enforce_save=self.save_files)
 
         # 4. Resumir con Gemini (nuevo sistema)
         summary_output = AIManager.summarize(text, mode)
@@ -35,11 +36,11 @@ class Orchestrator:
         # 5. Log básico del agente
         log_agent_result(summary_output)
 
-        # 6. Guardar métricas
+        # 6. Guardar métricas (SIEMPRE se guardan)
         self.formatter.save_metrics(audio_info["name"], summary_output, mode)
 
         # 7. Guardar salida final
-        return self.formatter.save_output(audio_info["name"], summary_output, mode)
+        return (self.formatter.save_output(audio_info["name"], summary_output, mode, enforce_save=self.save_files), text, summary_output)
 
     def run_text(self, text_path, mode="default"):
         logger.info(f"[ORCHESTRATOR] Ejecutando flujo de texto para: {text_path} con modo: {mode}")
@@ -57,4 +58,4 @@ class Orchestrator:
         log_agent_result(summary_output)
 
         # 4. Guardar salida final
-        return self.formatter.save_output(name, summary_output, mode)
+        return (self.formatter.save_output(name, summary_output, mode, enforce_save=self.save_files), text, summary_output)

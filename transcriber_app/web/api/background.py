@@ -7,6 +7,7 @@ from transcriber_app.modules.ai.groq.transcriber import GroqTranscriber
 from transcriber_app.modules.logging.logging_config import setup_logging
 from .emailer import send_email_with_attachment
 from pathlib import Path
+import os
 
 # Logging
 logger = setup_logging("transcribeapp")
@@ -27,27 +28,36 @@ def process_audio_job(job_id: str, nombre: str, modo: str, email: str):
             logger.error(f"[BACKGROUND JOB] Audio no encontrado: {audio_path}")
             return
 
-        # === USAR EL MISMO PIPELINE QUE EL CLI ===
+        # === USAR EL MISMO PIPELINE QUE EL CLI PERO SIN GUARDAR ARCHIVOS ===
         orchestrator = Orchestrator(
             receiver=AudioReceiver(),
             transcriber=GroqTranscriber(),
-            formatter=OutputFormatter()
+            formatter=OutputFormatter(),
+            save_files=False
         )
 
-        output_file = orchestrator.run_audio(str(audio_path), modo)
+        output_file, text, summary = orchestrator.run_audio(str(audio_path), modo)
 
-        logger.info(f"[BACKGROUND JOB] Archivo generado: {output_file}")
+        logger.info(f"[BACKGROUND JOB] Procesamiento en memoria completado para {nombre}")
 
-        send_email_with_attachment(
-            to=email,
-            subject=f"Transcripción lista: {nombre}",
-            body="Adjunto encontrarás el archivo procesado.",
-            attachment_path=str(output_file)
-        )
+        # Guardar resultados en el JOB_STATUS para que el frontend los recoja
+        JOB_STATUS[job_id] = {
+            "status": "done",
+            "transcription": text,
+            "markdown": summary
+        }
 
-        JOB_STATUS[job_id] = "done"
         logger.info(f"[BACKGROUND JOB] Job {job_id} finalizado correctamente")
 
     except Exception as e:
-        JOB_STATUS[job_id] = "error"
+        JOB_STATUS[job_id] = {"status": "error", "error": str(e)}
         logger.error(f"[BACKGROUND JOB] Error en job {job_id}: {e}", exc_info=True)
+    finally:
+        # Borrar el audio original siempre
+        try:
+            audio_path = Path("audios") / f"{nombre}.mp3"
+            if audio_path.exists():
+                os.remove(audio_path)
+                logger.info(f"[BACKGROUND JOB] Audio temporal eliminado: {audio_path}")
+        except Exception as e:
+            logger.warning(f"[BACKGROUND JOB] No se pudo eliminar el audio temporal: {e}")

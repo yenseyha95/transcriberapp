@@ -20,10 +20,10 @@ class DummyTranscriber:
 
 
 class DummyFormatter:
-    def save_transcription(self, name, text):
+    def save_transcription(self, name, text, enforce_save=True):
         return True
 
-    def save_output(self, name, summary, mode):
+    def save_output(self, name, summary, mode, enforce_save=True):
         return f"{name}_{mode}.md"
 
     def save_metrics(self, name, summary, mode):
@@ -36,6 +36,8 @@ def test_orchestrator_runs(monkeypatch):
     monkeypatch.setattr(AIManager, "summarize", lambda text, mode: "resumen generado")
 
     orch = Orchestrator(DummyReceiver(), DummyTranscriber(), DummyFormatter())
-    out = orch.run_text("transcripts/test.txt", "tecnico")
+    out, text, summary = orch.run_text("transcripts/test.txt", "tecnico")
 
     assert out == "test_tecnico.md"
+    assert text == "contenido de prueba"
+    assert summary == "resumen generado"

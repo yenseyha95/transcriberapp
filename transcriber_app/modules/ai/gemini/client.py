@@ -1,7 +1,6 @@
 # transcriber_app/modules/ai/gemini/client.py
 
 from transcriber_app.modules.ai.base.model_interface import AIModel
-from starlette.responses import Response
 from transcriber_app.modules.logging.logging_config import setup_logging
 from .agents import (
     tecnico_agent,
@@ -44,10 +43,15 @@ class GeminiModel(AIModel):
             logger.info(f"[GEMINI MODEL] Resultado (str): {result[:100]}...")
             return result
 
-        if isinstance(result, Response):
-            body = result.body.decode(result.charset or "utf-8")
-            logger.info(f"[GEMINI MODEL] Resultado (Response): {body[:100]}...")
-            return body
+        # Soporte para starlette.responses.Response sin dependencia directa fuerte
+        if type(result).__name__ == "Response" or type(result).__name__ == "JSONResponse":
+            try:
+                # Intentar acceder a .body
+                body = result.body.decode(getattr(result, "charset", None) or "utf-8")
+                logger.info(f"[GEMINI MODEL] Resultado (Response): {body[:100]}...")
+                return body
+            except Exception as e:
+                logger.warn(f"[GEMINI MODEL] No se pudo decodificar el cuerpo de la respuesta: {e}")
 
         # Cualquier otra cosa → error explícito
         raise RuntimeError(f"[GEMINI MODEL] Tipo inesperado en run_agent: {type(result)} - {repr(result)[:200]}")

@@ -64,16 +64,25 @@ async function handleJobCompletion(data, onComplete) {
     const nombre = document.getElementById("nombre")?.value?.trim() || "";
     const modo = document.getElementById("modo")?.value || "";
 
-    // Si no viene el markdown en la respuesta (caso normal del backend actual), lo cargamos explícitamente
+    // Si no viene el markdown en la respuesta, lo cargamos explícitamente (solo para retrocompatibilidad/CLI)
     if (!md && nombre && modo) {
-        md = await loadMarkdownResult(nombre, modo);
+        try {
+            md = await loadMarkdownResult(nombre, modo);
+        } catch (e) {
+            console.warn("No se pudo cargar el markdown desde el servidor, se usará el del job si existe.");
+        }
     }
 
-    // Renderizar resultado si existe
-    // (Renderizado de resultado movido a addResultBox en el callback final)
+    // Cargar transcripción original (prioridad a la que viene en data)
+    let transcriptionText = data.transcription;
 
-    // Cargar transcripción original
-    const transcriptionText = await loadTranscriptionFile(nombre);
+    if (!transcriptionText && nombre) {
+        try {
+            transcriptionText = await loadTranscriptionFile(nombre);
+        } catch (e) {
+            console.warn("No se pudo cargar la transcripción desde el servidor.");
+        }
+    }
 
     if (transcriptionText && elements.transcripcionTexto) {
         elements.transcripcionTexto.innerHTML = parseMarkdown(transcriptionText);

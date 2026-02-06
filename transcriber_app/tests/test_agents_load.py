@@ -5,7 +5,7 @@ from transcriber_app.modules.ai.gemini.agents.ejecutivo_agent import ejecutivo_a
 from transcriber_app.modules.ai.gemini.agents.refinamiento_agent import refinamiento_agent
 from transcriber_app.modules.ai.gemini.agents.bullet_agent import bullet_agent
 from transcriber_app.modules.ai.gemini.agents.default_agent import default_agent
-from transcriber_app.modules.ai.gemini.client import GeminiModel
+from transcriber_app.modules.ai.gemini.model import GeminiAgent
 
 
 def test_agents_initialize():
@@ -18,8 +18,8 @@ def test_agents_initialize():
     ]
 
     for agent in agents:
-        # 1. Debe ser instancia de GeminiModel
-        assert isinstance(agent, GeminiModel)
+        # 1. Debe ser instancia de GeminiAgent
+        assert isinstance(agent, GeminiAgent)
 
         # 2. Debe tener un nombre de modelo válido
         assert hasattr(agent, "model_name")

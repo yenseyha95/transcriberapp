@@ -96,9 +96,11 @@ def main():
     # ============================
     try:
         if input_type == "audio":
-            output = orchestrator.run_audio(path, mode)
+            output_file, text, summary = orchestrator.run_audio(path, mode)
         else:
-            output = orchestrator.run_text(path, mode)
+            output_file, text, summary = orchestrator.run_text(path, mode)
+        
+        output = f"✅ Transcripción guardada: {text[:100]}...\n✅ Resumen guardado en: {output_file}"
 
     except ValueError as e:
         print(f"[BAD_AUDIO] {e}")

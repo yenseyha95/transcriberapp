@@ -73,8 +73,12 @@ async def upload_audio(
 @router.get("/status/{job_id}")
 def get_status(job_id: str):
     logger.info(f"[API ROUTE] Consultando estado del job: {job_id}")
-    status = JOB_STATUS.get(job_id, "unknown")
-    return {"job_id": job_id, "status": status}
+    job_data = JOB_STATUS.get(job_id, "unknown")
+    
+    if isinstance(job_data, dict):
+        return job_data
+    
+    return {"job_id": job_id, "status": job_data}
 
 
 @router.post("/chat/stream")
@@ -109,26 +113,40 @@ def check_name(name: str):
 @router.post("/process-existing")
 async def process_existing(
     nombre: str = Form(...),
-    modo: str = Form(...)
+    modo: str = Form(...),
+    transcription: str = Form(None)
 ):
+    text = None
     transcript_path = Path("transcripts") / f"{nombre}.txt"
 
-    if not transcript_path.exists():
-        raise HTTPException(status_code=404, detail="Transcripción no encontrada")
+    if transcription:
+        text = transcription
+        logger.info(f"[API ROUTE] Reutilizando transcripción recibida vía Form para: {nombre}")
+    elif transcript_path.exists():
+        text = transcript_path.read_text(encoding="utf-8")
+        logger.info(f"[API ROUTE] Reutilizando transcripción desde archivo para: {nombre}")
+    else:
+        raise HTTPException(status_code=404, detail="Transcripción no encontrada (ni en Form ni en disco)")
 
-    # Usar el mismo pipeline que CLI
+    # Usar el mismo pipeline que CLI pero sin guardar
     orchestrator = Orchestrator(
         receiver=AudioReceiver(),
         transcriber=GroqTranscriber(),
-        formatter=OutputFormatter()
+        formatter=OutputFormatter(),
+        save_files=False
     )
 
-    output_file = orchestrator.run_text(str(transcript_path), modo)
+    # 1. Resumir con Gemini
+    summary_output = AIManager.summarize(text, modo)
+    
+    # 2. Guardar métricas (SIEMPRE se guardan)
+    orchestrator.formatter.save_metrics(nombre, summary_output, modo)
 
     return {
         "status": "done",
         "mode": modo,
-        "output_file": output_file
+        "markdown": summary_output,
+        "transcription": text
     }
 
 

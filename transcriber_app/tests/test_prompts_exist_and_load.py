@@ -2,7 +2,7 @@
 import os
 from transcriber_app.config import AVAILABLE_MODES_DICT
 
-PROMPTS_DIR = "transcriber_app/modules/ai/prompts"
+PROMPTS_DIR = "transcriber_app/modules/ai/gemini/prompts"
 
 
 def test_prompts_exist():
