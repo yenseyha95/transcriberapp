@@ -34,6 +34,7 @@ def create_app() -> FastAPI:
 
     # Ruta absoluta al directorio outputs
     OUTPUTS_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "outputs"))
+    os.makedirs(OUTPUTS_DIR, exist_ok=True)
     print(">>> SERVING OUTPUTS FROM:", OUTPUTS_DIR)
 
     # Servir archivos .md generados por el backend
@@ -41,6 +42,7 @@ def create_app() -> FastAPI:
 
     # Ruta absoluta al directorio transcripts
     TRANSCRIPTS_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "transcripts"))
+    os.makedirs(TRANSCRIPTS_DIR, exist_ok=True)
     print(">>> SERVING TRANSCRIPTS FROM:", TRANSCRIPTS_DIR)
 
     # Servir archivos .txt de transcripciones
