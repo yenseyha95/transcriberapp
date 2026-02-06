@@ -109,20 +109,17 @@ function setStatusText(text) {
  * @param {boolean} hayAudio - Si hay audio cargado
  */
 function updateRecordingButtonsState(hayAudio) {
+    // REGLAS REFINADAS:
     // Con audio: grabar ❌, parar ❌, borrar ✅, descargar ✅, cargar ✅
     // Sin audio: grabar ✅, cargar ✅, parar ❌, borrar ❌, descargar ❌
 
     if (elements.recordBtn) {
         elements.recordBtn.disabled = hayAudio;
-        if (hayAudio) {
-            elements.recordBtn.title = "Audio cargado — grabación deshabilitada";
-        } else {
-            elements.recordBtn.title = "";
-        }
+        elements.recordBtn.title = hayAudio ? "Audio cargado — grabación deshabilitada" : "";
     }
 
     if (elements.stopBtn) {
-        elements.stopBtn.disabled = true;  // Siempre deshabilitado cuando no está grabando
+        elements.stopBtn.disabled = true; // El botón parar solo debe estar activo mientras se graba (manejado en startRecording)
     }
 
     if (elements.deleteBtn) {
@@ -134,7 +131,7 @@ function updateRecordingButtonsState(hayAudio) {
     }
 
     if (elements.uploadBtn) {
-        elements.uploadBtn.disabled = false;  // Siempre habilitado (se puede cargar audio siempre)
+        elements.uploadBtn.disabled = false; // Siempre se puede cargar un audio nuevo (sustituye al actual)
     }
 }
 

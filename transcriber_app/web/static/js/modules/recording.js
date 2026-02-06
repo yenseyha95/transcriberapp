@@ -26,9 +26,13 @@ async function startRecording() {
 
         if (elements.recordBtn) {
             elements.recordBtn.disabled = true;
+            elements.recordBtn.title = "Grabación en curso";
             setRecordingButtonState(true);
         }
         if (elements.stopBtn) elements.stopBtn.disabled = false;
+        if (elements.uploadBtn) elements.uploadBtn.disabled = true;
+        if (elements.deleteBtn) elements.deleteBtn.disabled = true;
+        if (elements.downloadBtn) elements.downloadBtn.disabled = true;
 
     } catch (error) {
         console.error("Error al acceder al micrófono:", error);
@@ -45,7 +49,6 @@ function stopRecording() {
         setStatusText("Grabación finalizada.");
 
         if (elements.recordBtn) {
-            elements.recordBtn.disabled = false;
             setRecordingButtonState(false);
         }
         if (elements.stopBtn) elements.stopBtn.disabled = true;

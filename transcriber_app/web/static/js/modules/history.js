@@ -50,7 +50,7 @@ async function loadHistoryItems() {
                 textSpan.onclick = () => loadTranscriptionFromHistory(item.id);
 
                 const deleteBtn = document.createElement("button");
-                deleteBtn.innerHTML = "🗑️";
+                deleteBtn.innerHTML = "✖";
                 deleteBtn.title = "Eliminar transcripción";
                 deleteBtn.className = "btn-delete-history ml-2 opacity-50 hover:opacity-100";
                 deleteBtn.style = "background: none; border: none; cursor: pointer; padding: 4px; font-size: 1.1em;";
@@ -172,7 +172,9 @@ async function loadTranscriptionFromHistory(id) {
             });
         }
 
-        // Cargar grabación si existe
+        validateSessionName(item.nombre);
+
+        // Cargar grabación si existe (determina estado final de botones)
         if (item.grabacion) {
             const blob = reconstructBlob(item.grabacion);
             if (blob && elements.preview) {
@@ -186,7 +188,6 @@ async function loadTranscriptionFromHistory(id) {
             updateRecordingButtonsState(false);  // No hay audio
         }
 
-        validateSessionName(item.nombre);
         if (elements.chatToggle) elements.chatToggle.disabled = false;
 
         // 🔥 Actualizar estado del botón Enviar con los modos del historial

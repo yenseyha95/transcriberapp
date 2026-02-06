@@ -498,8 +498,6 @@ body.history-open.chat-open .session-status {
     white-space: pre-wrap;
     word-wrap: break-word;
     padding: 1rem;
-    background-color: var(--color-gray-800);
-    color: var(--color-gray-200);
     border-radius: var(--radius-md);
     font-family: 'Courier New', monospace;
     max-height: 300px;

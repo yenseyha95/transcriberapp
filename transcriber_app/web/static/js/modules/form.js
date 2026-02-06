@@ -37,14 +37,8 @@ function validateSessionName(nombre) {
     if (elements.sessionLabel) {
         elements.sessionLabel.textContent = isValid ? trimmed : "Sin sesión";
 
-        if (elements.sessionLabel.textContent === "Sin sesión") {
-            if (elements.nameWarning) elements.nameWarning.hidden = false;
-            if (elements.uploadBtn) elements.uploadBtn.disabled = true;
-            if (elements.recordBtn) elements.recordBtn.disabled = true;
-        } else {
-            if (elements.nameWarning) elements.nameWarning.hidden = true;
-            if (elements.uploadBtn) elements.uploadBtn.disabled = false;
-            if (elements.recordBtn) elements.recordBtn.disabled = false;
+        if (elements.nameWarning) {
+            elements.nameWarning.hidden = isValid;
         }
 
         if (isValid) {
@@ -57,13 +51,6 @@ function validateSessionName(nombre) {
             if (btnNuevaSesion) btnNuevaSesion.disabled = true;
         }
     }
-
-    // Actualizar estado de botones según validez
-    if (elements.recordBtn) elements.recordBtn.disabled = !isValid;
-    if (elements.stopBtn) elements.stopBtn.disabled = true;
-    if (elements.deleteBtn) elements.deleteBtn.disabled = true;
-    if (elements.downloadBtn) elements.downloadBtn.disabled = true;
-    if (elements.sendBtn) elements.sendBtn.disabled = !isValid;
 
     return isValid;
 }
