@@ -73,5 +73,12 @@ class GeminiAgent:
             stream=stream
         )
 
+        if stream:
+            def generator():
+                for chunk in response:
+                    if hasattr(chunk, "text") and chunk.text:
+                        yield chunk.text
+            return generator()
+
         logger.info(f"[GEMINI AGENT] Respuesta bruta recibida: {repr(response)[:200]}. Tipo: {type(response)}")
         return normalize_gemini_output(response)

@@ -204,8 +204,8 @@ async function* chatStream(message, mode, transcripcion, resumen) {
     while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        buffer += decoder.decode(value);
-        yield buffer;
+        const chunk = decoder.decode(value);
+        yield chunk;
     }
 }
 

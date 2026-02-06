@@ -84,11 +84,19 @@ async def chat_stream(payload: dict):
 
     agent = AIManager.get_agent(mode)
 
-    def stream():
-        for chunk in agent.run(message, stream=True):
-            yield chunk
+    async def chat_stream_gen():
+        try:
+            logger.info(f"[CHAT STREAM] Iniciando stream para mensaje: {message[:50]}...")
+            # agent.run(..., stream=True) devuelve un generador
+            for chunk in agent.run(message, stream=True):
+                if chunk:
+                    yield chunk
+            logger.info("[CHAT STREAM] Stream finalizado con éxito")
+        except Exception as e:
+            logger.error(f"[CHAT STREAM] Error en generador: {e}")
+            yield f"\n[Error en servidor: {str(e)}]"
 
-    return StreamingResponse(stream(), media_type="text/plain")
+    return StreamingResponse(chat_stream_gen(), media_type="text/plain")
 
 
 @router.get("/check-name")

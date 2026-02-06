@@ -26,6 +26,32 @@ function addMessage(text, sender = "user", returnNode = false) {
 }
 
 /**
+ * Recopila todos los resultados procesados en un formato estructurado para la IA
+ */
+function gatherAllResultsContext() {
+    if (!elements.resultContent) return "";
+
+    const resultBoxes = elements.resultContent.querySelectorAll(".result-box");
+    let context = "";
+
+    resultBoxes.forEach(box => {
+        const modeBtn = box.querySelector(".mode-toggle");
+        const contentDiv = box.querySelector(".collapsible-content");
+
+        if (modeBtn && contentDiv) {
+            const modeName = modeBtn.textContent.replace(/[▼▶]/g, "").trim();
+            const contentText = contentDiv.textContent.trim();
+
+            context += `--- ANÁLISIS MODO: ${modeName} ---\n`;
+            context += `${contentText}\n`;
+            context += `-----------------------------------\n\n`;
+        }
+    });
+
+    return context;
+}
+
+/**
  * Envía un mensaje de chat
  */
 async function sendMessage() {
@@ -34,10 +60,12 @@ async function sendMessage() {
 
     const nombre = document.getElementById("nombre")?.value?.trim() || "";
     const transcripcion = elements.transcripcionTexto?.textContent?.trim() || "";
-    const resumen = elements.mdResult?.textContent?.trim() || "";
+
+    // Obtener contexto estructurado de todos los resultados
+    const resumen = gatherAllResultsContext();
     const modo = document.getElementById("modo")?.value || "";
 
-    // Validar que hay contenido
+    // Validar que hay contenido (mínimo la transcripción o algún resumen)
     if (!transcripcion && !resumen) {
         alert("No hay transcripción ni resumen disponible para chatear.");
         return;
@@ -51,16 +79,19 @@ async function sendMessage() {
     showOverlay();
 
     try {
-        let acumulado = "";
         let textoFinal = "";
+        let isFirstChunk = true;
 
         for await (const parcial of chatStream(msg, modo, transcripcion, resumen)) {
-            hideOverlay();
-            acumulado += parcial;
+            if (isFirstChunk) {
+                hideOverlay();
+                isFirstChunk = false;
+            }
+
+            textoFinal += parcial;
 
             // Mostrar texto en vivo sin parsear markdown
-            if (aiMsg) aiMsg.innerHTML = `<pre>${acumulado}</pre>`;
-            textoFinal = acumulado;
+            if (aiMsg) aiMsg.innerHTML = `<pre style="white-space: pre-wrap; word-wrap: break-word;">${textoFinal}</pre>`;
         }
 
         // Cuando termina el streaming → renderizamos markdown completo
@@ -68,6 +99,7 @@ async function sendMessage() {
         chatHistory.push({ role: "assistant", content: textoFinal });
 
     } catch (e) {
+        hideOverlay();
         if (aiMsg) aiMsg.innerHTML = formatAsHTML("Error al procesar la respuesta.");
         console.error("Error en chat:", e);
     }
