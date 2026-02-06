@@ -330,10 +330,28 @@ function addResultBox(mode, content, initiallyExpanded = null) {
         if (toggleBtn && contentDiv) {
             toggleBtn.onclick = () => {
                 const isExpanded = toggleBtn.getAttribute("aria-expanded") === "true";
-                toggleBtn.setAttribute("aria-expanded", !isExpanded);
-                contentDiv.hidden = isExpanded;
+
+                // Si vamos a abrir este, cerramos los demás
+                if (!isExpanded) {
+                    const allToggles = elements.resultContent.querySelectorAll(".mode-toggle");
+                    allToggles.forEach(t => {
+                        if (t !== toggleBtn) {
+                            t.setAttribute("aria-expanded", "false");
+                            const arrow = t.querySelector(".arrow");
+                            if (arrow) arrow.textContent = "▶";
+                            // Ocultar su contenido correpondiente
+                            const targetId = t.getAttribute("aria-controls");
+                            const targetContent = document.getElementById(targetId);
+                            if (targetContent) targetContent.hidden = true;
+                        }
+                    });
+                }
+
+                const newState = !isExpanded;
+                toggleBtn.setAttribute("aria-expanded", newState);
+                contentDiv.hidden = !newState;
                 const arrow = toggleBtn.querySelector(".arrow");
-                if (arrow) arrow.textContent = isExpanded ? "▶" : "▼";
+                if (arrow) arrow.textContent = newState ? "▼" : "▶";
             };
         }
     }
