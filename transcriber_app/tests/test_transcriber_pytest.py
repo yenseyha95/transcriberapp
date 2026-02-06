@@ -16,7 +16,8 @@ def mock_groq_api():
         with patch("transcriber_app.modules.ai.groq.transcriber.ensure_wav", return_value="fake.wav"):
             with patch("builtins.open", MagicMock()):
                 with patch("transcriber_app.modules.ai.groq.transcriber.os.unlink", MagicMock()):
-                    yield mock_post
+                    with patch("transcriber_app.modules.ai.groq.transcriber.GROQ_API_KEY", "fake_key"):
+                        yield mock_post
 
 
 def test_transcribe_returns_text(mock_groq_api):

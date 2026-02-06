@@ -19,11 +19,11 @@ def process_audio_job(job_id: str, nombre: str, modo: str, email: str):
     logger.info(f"[BACKGROUND JOB] Parámetros: nombre={nombre!r}, modo={modo!r}, email={email!r}")
 
     try:
-        JOB_STATUS[job_id] = "running"
+        JOB_STATUS[job_id] = {"status": "running"}
 
         audio_path = Path("audios") / f"{nombre}.mp3"
         if not audio_path.exists():
-            JOB_STATUS[job_id] = "error"
+            JOB_STATUS[job_id] = {"status": "error"}
             logger.error(f"[BACKGROUND JOB] Audio no encontrado: {audio_path}")
             return
 

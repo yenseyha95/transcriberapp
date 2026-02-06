@@ -25,7 +25,7 @@ def test_process_audio_job_success(mock_orchestrator, cleanup_job_status):
 
     JOB_STATUS[job_id] = {"status": "pending"}
 
-    with patch("transcriber_app.web.api.background.os.path.exists", return_value=True):
+    with patch("transcriber_app.web.api.background.Path.exists", return_value=True):
         with patch("transcriber_app.web.api.background.os.remove") as mock_remove:
             process_audio_job(job_id, nombre, modo, email)
 
@@ -42,7 +42,7 @@ def test_process_audio_job_error(mock_orchestrator, cleanup_job_status):
 
     JOB_STATUS[job_id] = {"status": "pending"}
 
-    with patch("transcriber_app.web.api.background.os.path.exists", return_value=True):
+    with patch("transcriber_app.web.api.background.Path.exists", return_value=True):
         with patch("transcriber_app.web.api.background.os.remove") as mock_remove:
             process_audio_job(job_id, "error", "default", "test@example.com")
 
