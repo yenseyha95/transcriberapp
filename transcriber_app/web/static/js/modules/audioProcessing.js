@@ -93,6 +93,7 @@ async function processNewRecording(audioBlob, nombre, email, modo, onJobStarted,
     const result = await uploadAudio(audioBlob, nombre, modo, email);
 
     if (!result.success) {
+        hideOverlay();
         alert(result.error);
         setStatusText("Error: " + result.error);
         if (onError) onError(result.error);

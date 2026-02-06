@@ -96,6 +96,7 @@ async function uploadAudio(audioBlob, nombre, modo, email) {
         console.log("Datos recibidos:", data);
 
         if (data.job_id) {
+            // NOTA: NO ocultamos el overlay aquí porque empieza el polling
             return {
                 success: true,
                 jobId: data.job_id
@@ -107,6 +108,7 @@ async function uploadAudio(audioBlob, nombre, modo, email) {
         }
     } catch (err) {
         console.error("Error completo al enviar audio:", err);
+        hideOverlay(); // Ocultar si hay error inicial
 
         let errorMessage = "Error al enviar el audio.";
 
@@ -124,8 +126,6 @@ async function uploadAudio(audioBlob, nombre, modo, email) {
             success: false,
             error: errorMessage
         };
-    } finally {
-        hideOverlay();
     }
 }
 
