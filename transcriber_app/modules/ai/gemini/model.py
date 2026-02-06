@@ -1,7 +1,42 @@
+# transcriber_app/modules/ai/gemini/model.py
+
 import google.generativeai as genai
 from transcriber_app.config import GOOGLE_API_KEY
+from transcriber_app.modules.logging.logging_config import setup_logging
+
+# Logging
+logger = setup_logging("transcribeapp")
 
 genai.configure(api_key=GOOGLE_API_KEY)
+
+
+def normalize_gemini_output(response):
+    # Caso 1: string directo
+    if isinstance(response, str):
+        return response
+
+    # Caso 2: objeto con .text
+    if hasattr(response, "text") and isinstance(response.text, str):
+        return response.text
+
+    # Caso 3: iterable de eventos (streaming o modelos flash-lite)
+    if hasattr(response, "__iter__") and not isinstance(response, (bytes, dict)):
+        chunks = []
+        for event in response:
+            if hasattr(event, "text") and event.text:
+                chunks.append(event.text)
+            elif isinstance(event, str):
+                chunks.append(event)
+        return "".join(chunks)
+
+    # Caso 4: dict con contenido
+    if isinstance(response, dict):
+        if "text" in response:
+            return response["text"]
+        return str(response)
+
+    # Caso 5: cualquier otra cosa → convertir a string
+    return str(response)
 
 
 class GeminiAgent:
@@ -16,24 +51,27 @@ class GeminiAgent:
     ):
         self.model_name = model_name
         self.system_prompt = system_prompt
-        self.temperature = temperature
-        self.top_p = top_p
-        self.top_k = top_k
-        self.max_output_tokens = max_output_tokens
 
-        # El constructor AHORA es simple
-        self._model = genai.GenerativeModel(self.model_name)
+        self.generation_config = {
+            "temperature": temperature,
+            "top_p": top_p,
+            "top_k": top_k,
+            "max_output_tokens": max_output_tokens,
+        }
 
-    def run(self, text: str) -> str:
-        response = self._model.generate_content(
-            text,
-            system_instruction=self.system_prompt,
-            generation_config={
-                "temperature": self.temperature,
-                "top_p": self.top_p,
-                "top_k": self.top_k,
-                "max_output_tokens": self.max_output_tokens,
-            },
+        self._model = genai.GenerativeModel(
+            model_name=self.model_name,
+            generation_config=self.generation_config
         )
 
-        return getattr(response, "text", "") or ""
+    def run(self, text: str, stream: bool = False):
+        logger.info(f"[GEMINI AGENT] stream recibido: {stream}")
+        logger.info(f"[GEMINI AGENT] Texto recibido: {text[:100]}...")
+
+        response = self._model.generate_content(
+            self.system_prompt + "\n\n" + text,
+            stream=stream
+        )
+
+        logger.info(f"[GEMINI AGENT] Respuesta bruta recibida: {repr(response)[:200]}. Tipo: {type(response)}")
+        return normalize_gemini_output(response)

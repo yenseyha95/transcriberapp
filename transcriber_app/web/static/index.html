@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TranscriberApp Web - Transcripción de Audio Inteligente</title>
     <meta name="description" content="Aplicación web para grabar, transcribir y procesar audio con inteligencia artificial">
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/css/github-markdown.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="icon" href="data:,">
-    <script src="/static/marked.min.js" defer></script>
     <!-- Precargar recursos importantes -->
     <!-- <link rel="preload" href="/static/recorder.js" as="script" crossorigin> -->
 </head>
@@ -161,6 +161,11 @@
                 <span aria-hidden="true">×</span>
             </button>
         </div>
+        <div class="history-actions">
+            <button id="btnNuevaSesion" class="btn btn-secondary history-reset-btn" disabled>
+                Nueva sesión
+            </button>
+        </div>
         <nav>
             <ul id="historyList" class="history-list" role="list"></ul>
         </nav>
@@ -206,7 +211,21 @@
         <span class="visually-hidden">Procesando, por favor espere...</span>
     </div>
 
+    <!-- Modal de confirmación para nueva sesión -->
+    <div id="modalNuevaSesion" class="modal hidden">
+        <div class="modal-content">
+            <h3>¿Comenzar nueva sesión?</h3>
+            <p>Se guardará la sesión actual en el historial y se limpiará la pantalla.</p>
+
+            <div class="modal-buttons">
+                <button id="modalCancelar" class="btn btn-secondary">Cancelar</button>
+                <button id="modalConfirmar" class="btn btn-danger">Sí, continuar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts al final para mejor rendimiento -->
-    <script type="module" src="/static/recorder.js?v=25" defer></script>
+    <script src="/static/lib/marked.min.js"></script>
+    <script type="module" src="/static/js/main.js?v=04"></script>
 </body>
 </html>

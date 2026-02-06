@@ -3,7 +3,7 @@ import os
 import sys
 
 from transcriber_app.modules.audio_receiver import AudioReceiver
-from transcriber_app.modules.transcriber import Transcriber
+from transcriber_app.modules.transcriber_cli import Transcriber
 from transcriber_app.modules.output_formatter import OutputFormatter
 from transcriber_app.runner.orchestrator import Orchestrator
 from transcriber_app.config import AVAILABLE_MODES

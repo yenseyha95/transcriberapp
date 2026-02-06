@@ -22,10 +22,12 @@ class Orchestrator:
         audio_info = self.receiver.load(audio_path)
 
         # 2. Transcribir
-        text = self.transcriber.transcribe(audio_info["path"])
+        text, metadata = self.transcriber.transcribe(audio_info["path"])
+        logger.info(f"[ORCHESTRATOR] Metadata de transcripción: {metadata}")
 
         # 3. Guardar transcripción
-        self.formatter.save_transcription(audio_info["name"], text)
+        safe_name = audio_info["name"].lower()
+        self.formatter.save_transcription(safe_name, text)
 
         # 4. Resumir con Gemini (nuevo sistema)
         summary_output = AIManager.summarize(text, mode)

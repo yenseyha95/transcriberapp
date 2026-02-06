@@ -1,11 +1,15 @@
 # transcriber_app/web/api/routes.py
 import os
+import uuid
 from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks, HTTPException
 from fastapi.responses import StreamingResponse
 from pathlib import Path
-from transcriber_app.modules.ai.ai_manager import AIManager, log_agent_result
-import uuid
-
+from transcriber_app.modules.ai.ai_manager import AIManager
+from transcriber_app.runner.orchestrator import Orchestrator
+from transcriber_app.modules.output_formatter import OutputFormatter
+from transcriber_app.modules.audio_receiver import AudioReceiver
+from transcriber_app.modules.ai.groq.transcriber import GroqTranscriber
+from fastapi.responses import FileResponse
 from .background import process_audio_job
 from .background import JOB_STATUS
 from transcriber_app.modules.logging.logging_config import setup_logging
@@ -41,7 +45,8 @@ async def upload_audio(
     audios_dir.mkdir(exist_ok=True)
 
     # Guardar archivo
-    audio_path = audios_dir / f"{nombre}.mp3"
+    safe_name = nombre.lower()
+    audio_path = audios_dir / f"{safe_name}.mp3"
     with audio_path.open("wb") as f:
         f.write(await audio.read())
 
@@ -52,7 +57,7 @@ async def upload_audio(
     background_tasks.add_task(
         process_audio_job,
         job_id=job_id,
-        nombre=nombre,
+        nombre=safe_name,
         modo=modo,
         email=email
     )
@@ -81,7 +86,7 @@ async def chat_stream(payload: dict):
 
     def stream():
         for chunk in agent.run(message, stream=True):
-            yield chunk.content  # o chunk.text según el modelo
+            yield chunk
 
     return StreamingResponse(stream(), media_type="text/plain")
 
@@ -103,14 +108,33 @@ async def process_existing(
     if not transcript_path.exists():
         raise HTTPException(status_code=404, detail="Transcripción no encontrada")
 
-    text = transcript_path.read_text(encoding="utf-8")
+    # Usar el mismo pipeline que CLI
+    orchestrator = Orchestrator(
+        receiver=AudioReceiver(),
+        transcriber=GroqTranscriber(),
+        formatter=OutputFormatter()
+    )
 
-    agent = AIManager.get_agent(modo)
-    result = agent.run(text)
-    log_agent_result(result)
+    output_file = orchestrator.run_text(str(transcript_path), modo)
 
     return {
         "status": "done",
         "mode": modo,
-        "content": result.content
+        "output_file": output_file
     }
+
+
+@router.get("/transcripciones/{filename}")
+def get_transcription(filename: str):
+    path = Path("transcripts") / filename
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Archivo no encontrado")
+    return FileResponse(path, media_type="text/plain")
+
+
+@router.get("/resultados/{filename}")
+def get_result(filename: str):
+    path = Path("outputs") / filename
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Archivo no encontrado")
+    return FileResponse(path, media_type="text/markdown")

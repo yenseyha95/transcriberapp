@@ -11,6 +11,7 @@ load_dotenv()
 AVAILABLE_MODES = ["default", "tecnico", "refinamiento", "ejecutivo", "bullet"]
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 USE_MODEL = os.getenv("USE_MODEL", "gemini-2.5-flash-lite")
 LANGUAGE = os.getenv("LANGUAGE", "es")
 

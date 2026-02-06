@@ -39,3 +39,5 @@ logs/
 # Ignorar Docker
 docker-compose.yml
 Dockerfile.base
+
+wheels/
