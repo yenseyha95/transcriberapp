@@ -21,10 +21,14 @@ services:
       - TZ=Europe/Madrid
       - PYTHONUNBUFFERED=1
       - GROQ_API_KEY=${GROQ_API_KEY}
+      - UVICORN_WORKERS=1
 
     command: >
       uvicorn transcriber_app.web.web_app:app
-      --host 0.0.0.0
+      --host ::
       --port 9000
       --log-level debug
       --reload
+      --proxy-headers
+      --forwarded-allow-ips="*"
+
