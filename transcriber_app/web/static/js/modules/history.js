@@ -180,8 +180,9 @@ async function loadTranscriptionFromHistory(id) {
                 return a.localeCompare(b);
             });
 
-            modes.forEach(mode => {
-                addResultBox(mode, item.resumenes[mode]);
+            modes.forEach((mode, index) => {
+                // Solo expandir el primero
+                addResultBox(mode, item.resumenes[mode], index === 0);
             });
         }
 
@@ -214,6 +215,14 @@ async function loadTranscriptionFromHistory(id) {
             modo,
             getProcessedModes()
         );
+
+        // Auto-scroll a resultados tras cargar del historial
+        setTimeout(() => {
+            const resultSection = document.getElementById("result");
+            if (resultSection) {
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
     } catch (error) {
         console.error("Error cargando transcripción del historial:", error);
         alert("Error al cargar la transcripción del historial.");
@@ -261,8 +270,13 @@ function renderMultipleTranscriptions(transcriptionsArray) {
 /**
  * Añade una caja de resultado al contenedor principal
  */
-function addResultBox(mode, content) {
+function addResultBox(mode, content, initiallyExpanded = null) {
     if (!elements.resultContent) return;
+
+    // Si no se especifica, expandir solo si es el primer resultado
+    const shouldExpand = initiallyExpanded !== null
+        ? initiallyExpanded
+        : elements.resultContent.children.length === 0;
 
     // Asegurar que la sección padre (#result) sea visible y esté expandida
     const resultSection = document.getElementById("result");
@@ -283,14 +297,14 @@ function addResultBox(mode, content) {
     const html = `
     <div class="result-box mb-4 pb-4 border-b" id="${uniqueId}">
         <div class="result-header flex justify-between items-center mb-2" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="collapsible-toggle mode-toggle" aria-expanded="true" aria-controls="${contentId}" style="background: none; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 0; text-transform: uppercase; font-size: 1.1em; color: #444;">
-                <span class="arrow">▼</span> ${mode}
+            <button class="collapsible-toggle mode-toggle" aria-expanded="${shouldExpand}" aria-controls="${contentId}" style="background: none; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 0; text-transform: uppercase; font-size: 1.1em; color: #444;">
+                <span class="arrow">${shouldExpand ? "▼" : "▶"}</span> ${mode}
             </button>
             <button class="btn btn-sm btn-print-item" aria-label="Imprimir ${mode}" style="padding: 4px 8px; font-size: 0.9em; cursor: pointer;">
                 🖨️ PDF
             </button>
         </div>
-        <div id="${contentId}" class="collapsible-content markdown-body" style="margin-top: 10px;">
+        <div id="${contentId}" class="collapsible-content markdown-body" style="margin-top: 10px;" ${shouldExpand ? "" : "hidden"}>
             ${parseMarkdown(content)}
         </div>
     </div>

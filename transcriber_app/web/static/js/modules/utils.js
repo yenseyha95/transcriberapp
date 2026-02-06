@@ -36,15 +36,24 @@ function formatAsHTML(text) {
 function parseMarkdown(markdown) {
     if (!markdown) return "";
     try {
-        if (typeof marked !== 'undefined' && marked.parse) {
-            return marked.parse(markdown);
+        // Intentar encontrar marked en el ámbito global o window
+        const m = (typeof marked !== 'undefined') ? marked : (window.marked || null);
+
+        if (m && (typeof m === 'function' || m.parse)) {
+            const parseFn = m.parse || m;
+            return parseFn(markdown);
         } else {
-            console.warn("marked no está disponible, usando texto plano");
-            return `<pre>${markdown}</pre>`;
+            console.warn("marked no está disponible, usando parseador básico");
+            // Fallback muy básico para títulos si falla marked
+            return markdown
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/\n/g, '<br>');
         }
     } catch (error) {
         console.error("Error parseando markdown:", error);
-        return `<pre>${markdown}</pre>`;
+        return markdown.replace(/\n/g, '<br>');
     }
 }
 

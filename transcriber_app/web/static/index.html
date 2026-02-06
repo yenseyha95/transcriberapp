@@ -185,11 +185,11 @@
 
         <div class="chat-input-container">
             <label for="chatInput" class="visually-hidden">Pregunta para el asistente</label>
-            <input id="chatInput" 
-                   class="form-control"
-                   type="text" 
+            <textarea id="chatInput" 
+                   class="form-control chat-input"
                    placeholder="Preguntar sobre la transcripción…"
-                   aria-label="Escribe tu pregunta">
+                   aria-label="Escribe tu pregunta"
+                   rows="1"></textarea>
             <button id="chatSend" class="btn btn-chat-send" aria-label="Enviar pregunta">
                 Enviar
             </button>
@@ -222,6 +222,6 @@
 
     <!-- Scripts al final para mejor rendimiento -->
     <script src="/static/lib/marked.min.js"></script>
-    <script type="module" src="/static/js/main.js?v=015"></script>
+    <script type="module" src="/static/js/main.js?v=023"></script>
 </body>
 </html>

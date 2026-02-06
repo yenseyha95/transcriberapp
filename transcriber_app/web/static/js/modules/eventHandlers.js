@@ -193,6 +193,14 @@ async function handleSendAudio() {
             // Pasamos explícitamente contenido y modo
             await saveToHistoryIfComplete(result.content, result.mode);
 
+            // Auto-scroll a resultados
+            setTimeout(() => {
+                const resultSection = document.getElementById("result");
+                if (resultSection) {
+                    resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+
         } else {
             alert(result.error);
         }
@@ -226,6 +234,14 @@ async function handleSendAudio() {
             addProcessedMode(currentMode);
 
             await saveToHistoryIfComplete(mdContent, currentMode);
+
+            // Auto-scroll a resultados
+            setTimeout(() => {
+                const resultSection = document.getElementById("result");
+                if (resultSection) {
+                    resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
         }
     );
 }
@@ -406,8 +422,23 @@ function setupChatHandlers() {
     }
 
     if (elements.chatInput) {
-        elements.chatInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendMessage();
+        // Auto-redimensionar al escribir
+        elements.chatInput.addEventListener("input", () => {
+            elements.chatInput.style.height = "auto";
+            elements.chatInput.style.height = (elements.chatInput.scrollHeight) + "px";
+        });
+
+        // Manejar Enter para enviar y Shift+Enter para salto de línea
+        elements.chatInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+
+                // Resetear altura después de enviar
+                setTimeout(() => {
+                    elements.chatInput.style.height = "auto";
+                }, 0);
+            }
         });
     }
 }

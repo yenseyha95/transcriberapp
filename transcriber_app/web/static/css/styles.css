@@ -644,18 +644,67 @@ body.history-open.chat-open .session-status {
     align-self: flex-start;
 }
 
+/* Tipografía refinada para el asistente (Estilo Azure) */
+.msg-ai h1, .msg-ai h2, .msg-ai h3 {
+    font-weight: 600;
+    color: var(--color-gray-900);
+    margin: 0.8rem 0 0.4rem 0;
+    line-height: 1.3;
+}
+
+.msg-ai h1 { font-size: 1.15rem; }
+.msg-ai h2 { font-size: 1.05rem; }
+.msg-ai h3 { font-size: 0.95rem; }
+
+.msg-ai p {
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+.msg-ai p:last-child {
+    margin-bottom: 0;
+}
+
+.msg-ai ul, .msg-ai ol {
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+}
+
+.msg-ai li {
+    margin-bottom: 0.3rem;
+    font-size: 0.75rem;
+}
+
+.msg-ai strong {
+    font-weight: 600;
+}
+
 .chat-input-container {
     padding: 1.5rem;
     border-top: 1px solid var(--color-gray-200);
     display: flex;
     gap: 0.5rem;
+    align-items: flex-end; /* Evitar que el botón se estire verticalmente */
 }
 
-.chat-input-container input {
+.chat-input-container textarea {
     flex-grow: 1;
-    padding: 0.75rem;
-    border: 2px solid var(--color-gray-300);
-    border-radius: var(--radius-md);
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--color-gray-400);
+    border-radius: var(--radius-sm);
+    resize: none;
+    overflow-y: hidden;
+    max-height: 150px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    transition: border-color var(--transition-fast) ease;
+}
+
+.chat-input-container textarea:focus {
+    border-color: var(--color-primary);
+    outline: none;
 }
 
 .btn-chat-send {
